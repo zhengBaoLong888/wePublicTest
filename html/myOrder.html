@@ -1,0 +1,291 @@
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+		<title>我的订单</title>
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/myOrder.css" />
+	</head>
+
+	<body class="entirety-bg font-fam-style" style="background-color: #fff;">
+		<div id="load">加载中...</div>
+		<div class="store-main-div">
+
+		</div>
+		<div class="nullYoat">订单为空~</div>
+		<div class="marks">
+			<div id="qrcode"></div>
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../js/qrcode.min.js"></script>
+		<script>
+			var information = JSON.parse(localStorage.getItem("reltArray"));
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var base = localStorage.getItem("base");
+
+			function orderList() {
+				var html = '';
+				var html2 = '';
+				var ItemSum = 0;
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					url: base + "sale_inte/order/orderList.action",
+					async: true,
+
+					data: {
+						"enterpriseID": information.en,
+						"pinpaiID": information.pi,
+						"shopID": information.sh,
+						"ordSource": 1
+					},
+					beforeSend: function() {
+						$('#load').show();
+						$('.store-main-div').hide();
+					},
+					success: function(result) {
+						console.log(result);
+						if(result.data.rows.length == 0) {
+							$('#ddDisplay').hide();
+							$('.nullYoat').show();
+							$('.store-main').hide();
+						} else {
+							$('#ddDisplay').show();
+							$('.nullYoat').hide();
+							for(var i = 0; i < result.data.rows.length; i++) {
+								html += "<article class='store-main'>"
+								html2 = '';
+								ItemSum = 0;
+								for(var j = 0; j < result.data.rows[i].details.length; j++) {
+									if(result.data.rows[i].details.length == 0) {
+
+									} else {
+										if(result.data.rows[i].details[j].proType == 1) {
+											html2 += "<div class='divOr' data-tol='" + result.data.rows[i].details[j].proCount + "'>"
+											if(result.data.rows[i].details[j].imgs.length == 0) {
+												html2 += "<img class='col-1' src='../img/gysf_2.png' />"
+											} else {
+												html2 += "<img class='col-1' src='" + result.data.rows[i].details[j].imgs[0].path + "' />"
+											}
+											html2 += "<div class='col-2'>"
+											html2 += "<div class='col-2-row1'>"
+											html2 += "<span>" + result.data.rows[i].details[j].proName + "</span>"
+											html2 += "<span>¥" + result.data.rows[i].details[j].price + "</span>"
+											html2 += "<span>x" + result.data.rows[i].details[j].proCount + "</span>"
+											html2 += "</div>"
+											html2 += "<div class='col-2-row2'>"
+											if(result.data.rows[i].details[j].makes == null || result.data.rows[i].details[j].makes == '') {
+
+											} else {
+												for(q in result.data.rows[i].details[j].makes) {
+													html2 += "<span>" + result.data.rows[i].details[j].makes[q].praName + "</span>"
+												}
+											}
+											if(result.data.rows[i].details[j].mats == null || result.data.rows[i].details[j].mats == '' || result.data.rows[i].details[j].mats[0].matName == '未命名') {
+
+											} else {
+												html2 += "<span>" + result.data.rows[i].details[j].mats[0].matName + "</span>"
+											}
+											if(result.data.rows[i].details[j].tastes == null || result.data.rows[i].details[j].tastes == '') {
+
+											} else {
+												for(w in result.data.rows[i].details[j].tastes) {
+													html2 += "<span>" + result.data.rows[i].details[j].tastes[w].tasteName + "</span>"
+												}
+											}
+
+											html2 += "</div>"
+											html2 += "</div>"
+											html2 += "</div>"
+
+											//ItemSum += Number(result.data.rows[i].details[j].proCount);
+										} else if(result.data.rows[i].details[j].proType == 2) {
+											html2 += "<div class='divOr' data-tol='" + result.data.rows[i].details[j].proCount + "'>"
+											if(result.data.rows[i].details[j].imgs.length == 0) {
+												html2 += "<img class='col-1' src='../img/gysf_2.png' />"
+											} else {
+												html2 += "<img class='col-1' src='" + result.data.rows[i].details[j].imgs[0].path + "' />"
+											}
+											html2 += "<div class='col-2'>"
+											html2 += "<div class='col-2-row1'>"
+											html2 += "<span>" + result.data.rows[i].details[j].proName + "</span>"
+											html2 += "<span>¥" + result.data.rows[i].details[j].price + "</span>"
+											html2 += "<span>x" + result.data.rows[i].details[j].proCount + "</span>"
+											html2 += "</div>"
+											html2 += "<div class='col-2-row2'>"
+											for(var l = 0; l < result.data.rows[i].details[j].taocan.length; l++) {
+												html2 += "<span>" + result.data.rows[i].details[j].taocan[l].proName + "</span>"
+											}
+											html2 += "</div>"
+											html2 += "</div>"
+											html2 += "</div>"
+										}
+									}
+								}
+								html += html2
+								html += "<div class='creatTD'>下单时间：<span>" + result.data.rows[i].createTime + "</span></div>"
+								html += "<div class='creatTD'>所属门店：<span>" + result.data.rows[i].shopName + "</span></div>"
+								html += "<div class='creatTD'>订单编号：<span>" + result.data.rows[i].ordeNo.slice(6) + "</span></div>"
+								if(result.data.rows[i].status == 2) {
+									$('.goPayment').show();
+									html += "<div class='status'>状态：<span id='statusVal'>未付款</span></div>"
+									html += "<input class='orderNo' type='hidden' name='' value='" + result.data.rows[i].ordeNo + "'/>"
+									html += "<input class='orderId' type='hidden' name='' value='" + result.data.rows[i].orderId + "'/>"
+									html += "<article class='combined'>"
+									//html += "<span>共" + ItemSum + "件商品</span>"
+									html += "<span>合计：¥" + result.data.rows[i].totalPrice + "</span>"
+									html += "<span class='goPayment'>去付款</span>"
+									html += "<span class='deleteOrder'>删除</span>"
+									html += "</article>"
+								} else if(result.data.rows[i].status == 3) {
+									html += "<input class='pickUpCode' type='hidden' value='" + result.data.rows[i].pickUpCode + "'>"
+									html += "<div class='creatTD'>取货码：<span>" + result.data.rows[i].pickUpCode + "</span><span class='getCode'>二维码取货</span></div>"
+									html += "<div class='status'>状态：<span id='statusVal'>等待制作中</span></div>"
+									html += "<article class='combined'>"
+									//html += "<span>共" + ItemSum + "件商品</span>"
+									html += "<span>合计：¥" + result.data.rows[i].totalPrice + "</span>"
+									html += "</article>"
+//									html += "<div class='getCode'>获取取货码</div>"
+								} else if(result.data.rows[i].status == 4) {
+									html += "<input class='pickUpCode' type='hidden' value='" + result.data.rows[i].pickUpCode + "'>"
+									html += "<div class='status'>状态：<span id='statusVal'>制作中</span></div>"
+									html += "<div class='creatTD'>取货码：<span>" + result.data.rows[i].pickUpCode + "</span><span class='getCode'>二维码取货</span></div>"
+									html += "<article class='combined'>"
+									//html += "<span>共" + ItemSum + "件商品</span>"
+									html += "<span>合计：¥" + result.data.rows[i].totalPrice + "</span>"
+									html += "</article>"
+//									html += "<div class='getCode'>获取取货码</div>"
+								} else if(result.data.rows[i].status == 5) {
+									html += "<input class='pickUpCode' type='hidden' value='" + result.data.rows[i].pickUpCode + "'>"
+									html += "<div class='status'>状态：<span id='statusVal'>已完成</span></div>"
+									html += "<div class='creatTD'>取货码：<span>" + result.data.rows[i].pickUpCode + "</span><span class='getCode'>二维码取货</span></div>"
+									html += "<article class='combined'>"
+									//html += "<span>共" + ItemSum + "件商品</span>"
+									html += "<span>合计：¥" + result.data.rows[i].totalPrice + "</span>"
+									html += "</article>"
+//									html += "<div class='getCode'>获取取货码</div>"
+								} else if(result.data.rows[i].status == 7) {
+									html += "<div class='status'>状态：<span id='statusVal'>退单中-货料不足</span></div>"
+									html += "<article class='combined'>"
+									//html += "<span>共" + ItemSum + "件商品</span>"
+									html += "<span>合计：¥" + result.data.rows[i].totalPrice + "</span>"
+									html += "</article>"
+								}
+								html += "</article>"
+							}
+							$('.store-main-div').html(html);
+
+							$('.getCode').click(function() {
+								$('#qrcode').empty();
+								var pickUpCode = $(this).parents(".creatTD").siblings(".pickUpCode").val();
+								var qrcode = new QRCode(document.getElementById("qrcode"), {
+									width: 400,
+									height:400
+								});
+								qrcode.makeCode(pickUpCode);
+								$('.marks').show();
+								
+							})
+						}
+						$('.goPayment').click(function() {
+							var orderNo = $(this).parent().siblings('.orderNo').val();
+							var orderId_sd = $(this).parent().siblings('.orderId').val();
+							var orderId = orderNo;
+
+							function genQueryData() {
+								var result;
+								$.ajax({
+									type: "post",
+									url: base + "sale_inte/pay/wxPrePay.action",
+									headers: {
+										"Authorization": Authorization
+									},
+									data: {
+										"ordId": orderId_sd
+									},
+									dataType: "json",
+									async: false,
+									success: function(jsonData) {
+										if(jsonData != undefined && jsonData != null && jsonData != "") {
+											result = jsonData.data;
+										}
+									}
+								});
+								return result;
+							}
+
+							function onBridgeReady() {
+								WeixinJSBridge.invoke('getBrandWCPayRequest', genQueryData(), function(res) {
+									if(res.err_msg == "get_brand_wcpay_request:ok") {
+										location.reload();
+									}
+								});
+							}
+
+							function init() {
+								if(typeof WeixinJSBridge == "undefined") {
+									if(document.addEventListener) {
+										document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+									} else if(document.attachEvent) {
+										document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+										document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+									}
+								} else {
+									onBridgeReady();
+								}
+							}
+							init();
+						});
+
+						$('.deleteOrder').click(function() {
+							var orderId_delete = $(this).parent().siblings('.orderId').val();
+							$.ajax({
+								type: "post",
+								headers: {
+									"Content-Type": "application/x-www-form-urlencoded",
+									"Authorization": Authorization
+								},
+								url: base + "sale_inte/order/orderDel.action",
+								data: {
+									"orderId": orderId_delete
+								},
+								success: function(result) {
+									if(result.msg == 'yes') {
+										mui.toast('删除成功');
+										orderList();
+									} else if(result.code == '1186') {
+										mui.toast('订单已经无法删除');
+										//alert("订单已经无法删除");
+									}
+								}
+							});
+						})
+
+					},
+					complete: function() { //完成响应
+						$('.store-main-div').show();
+						$('#load').hide();
+					}
+				});
+
+			}
+			if(information.sh == null) {
+				$('#load').hide();
+			} else {
+				orderList();
+			}
+
+			$('.marks').click(function() {
+				$(this).hide();
+			})
+		</script>
+	</body>
+
+</html>

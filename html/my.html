@@ -1,0 +1,76 @@
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>我的</title>
+		<link rel="stylesheet" href="../css/my.css" />
+	</head>
+
+	<body>
+		<div class="my-head-pop">
+			<div class="my-head">
+				<div class="shopName comStyle" style="font-size: 33px;">小玎小珰</div>
+				<div class="storeIntegral comStyle" style="font-size: 22px;">可用积分：<span id="integralNumber">0</span>分</div>
+				<div class="membershipCard comStyle" style="font-size: 33px;">会员卡</div>
+				<div class="membershipCard_eng comStyle" style="font-size: 22px;">VIP CARD</div>
+
+			</div>
+		</div>
+		<img style="margin-top: 3px;" src="../img/my_7.png" />
+		<div class="my-list">
+			<ul class="mui-table-view">
+				
+				<li class="mui-table-view-cell mui-media">
+						<a href="couponDetails.html">
+							<img class="mui-media-object mui-pull-left" src="../img/my_81.png">
+								<p class='mui-ellipsis'>优惠券</p>
+						</a>
+				</li>
+				<li class="mui-table-view-cell mui-media" id="inso">
+					<a href="personal_information.html">
+						<img style="width:40px;height: 32px;" class="mui-media-object mui-pull-left" src="../img/my_4.png">
+						<p class='mui-ellipsis'>个人信息</p>
+					</a>
+				</li>
+				<li class="mui-table-view-cell mui-media">
+					<a href="shoppingTrolley.html">
+						<img style="width:40px;height: 40px;" class="mui-media-object mui-pull-left" src="../img/my_2.png">
+						<p class='mui-ellipsis'>购物车</p>
+					</a>
+				</li>
+				
+			</ul>
+		</div>
+		<script>
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var base = localStorage.getItem("base");
+			var storesParameters = JSON.parse(localStorage.getItem("reltArray"));
+
+			function getjfen() {
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					url: base + "sale_inte/uesr/integral.action",
+					data: {
+						"shopID": storesParameters.sh,
+						"enterpriseID": storesParameters.en,
+						"pinpaiID": storesParameters.pi
+					},
+					ContentType: "application/json",
+					success: function(result) {
+						console.log(result);
+						$('.shopName').html(result.data.brandName);
+						$('#integralNumber').html(result.data.integral);
+					}
+				});
+			}
+			getjfen();
+
+		</script>
+	</body>
+
+</html>

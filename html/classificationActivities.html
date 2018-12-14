@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+		<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/style.css" />
+		<link rel="stylesheet" href="../css/classificationActivities.css" />
+		<title>活动分类</title>
+	</head>
+
+	<body>
+		<div class="content">
+			<aside class="commenBack-head">
+				<a id="back" onclick="history.back();">返回</a>
+			</aside>
+			<div class="list_main">
+				<ul class="pirdocuts">
+				</ul>
+			</div>
+			<aside class="new_tasteChoose">
+				<div class="row1">
+					<div class="row1_goodsName">
+						<img class="row1_col_1" src="" />
+						<div class="row2_col_2">
+							<p class="row2_col_2_p1">西瓜沙冰</p>
+							<div class="row2_col_2_p2">价格:<span>¥</span><span id="taske_pirce">15</span></div>
+							<div class="row2_detils"></div>
+						</div>
+					</div>
+					<input id="numCount" type="hidden" value="1" />
+					<div class="row2">
+						<p>做法</p>
+						<ul class="row2_type1 zf1"></ul>
+						<ul class="zf2"></ul>
+						<div class="clearBoth"></div>
+						<p>加料</p>
+						<ul class="row2_type2"></ul>
+						<div class="clearBoth"></div>
+						<p>口味</p>
+						<ul class="row2_type3 kw1"></ul>
+						<ul class="kw2"></ul>
+						<div class="clearBoth"></div>
+					</div>
+
+					<div class="row3">
+						<span id="cancel">取消</span>
+						<span id="confirm">加入购物车</span>
+					</div>
+				</div>
+			</aside>
+			<div id="count">0</div>
+			<a class="diyIcon gwCat" href="shoppingTrolley.html">
+				<img id="catIcon" src="../img/index_shoppingCart.png" />
+			</a>
+			<!--<div class="priMask">
+				<div class="maskGoodsDetail">
+					<div class="close">
+						<img src="../img/close.png" />
+					</div>
+					<img id="goodImg" src="../img/1.png" />
+					<div class="bbq">
+						<p class="pp1">西瓜鲜果沙冰</p>
+						<p class="pp2"><span>15</span>元</p>
+					</div>
+					<div id="introduce">我是新品，相比苹果沙冰，我的口感要更好， 在这个夏天来一杯是最合适不过了。</div>
+				</div>
+			</div>-->
+
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../js/script.js"></script>
+		<script>
+			var base = localStorage.getItem("base");
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var isWhetherSorting = 0;
+			var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+
+			function bodyScroll(event) {
+				event.preventDefault();
+			}
+
+			getShopCatNum();
+
+			window.addEventListener('pageshow', function() {
+				getShopCatNum();
+			});
+
+			getShopCatNum();
+
+			function getGoods(_shopId, _enterpriseId, _pinpaiId) {
+				var ca = localStorage.getItem("ca");
+				var productListHtml = '';
+				$('.pirdocuts').html('');
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					data: {
+						"shopID": _shopId,
+						"enterpriseID": _enterpriseId,
+						"pinpaiID": _pinpaiId
+					},
+					url: base + "sale_inte/product/shopproduct.action",
+					ContentType: "application/json",
+					beforeSend: function() {
+						$('.chooseList').hide();
+						$('.loding').show();
+					},
+					success: function(result) {
+						console.log(result);
+						if(isWhetherSorting == 0) {
+							var productCallback = result.data.products;
+						} else if(isWhetherSorting == 1) {
+							var compare = function(obj1, obj2) {
+								var val1 = obj1.saleCnt;
+								var val2 = obj2.saleCnt;
+								if(val1 < val2) {
+									return -1;
+								} else if(val1 > val2) {
+									return 1;
+								} else {
+									return 0;
+								}
+							}
+							var productCallback = result.data.products.sort(compare);
+						}
+						var globalVar = '';
+						$.ajax({
+							type: "post",
+							headers: {
+								"Content-Type": "application/x-www-form-urlencoded",
+								"Authorization": Authorization
+							},
+							data: {
+								"shopID": _shopId,
+								"enterpriseID": _enterpriseId,
+								"pinpaiID": _pinpaiId
+							},
+							url: base + "sale_inte/salespromotion/getpromotion.action",
+							async: true,
+							success: function(resultActivity) {
+								for(t in productCallback) {
+									if(productCallback[t].proType == 1 && ca == 'mz' && productCallback[t].isPresented == 1) {
+										productListHtml += "<li class='list_liStyle' data-isSaled='" + productCallback[t].isSaled + "' data-isBargain='" + productCallback[t].isBargain + "' data-isPresented='" + productCallback[t].isPresented + "'  data-isDiscount='" + productCallback[t].isDiscount + "' data-isMoneyOff='" + productCallback[t].isMoneyOff + "' data-planType=''>"
+										productListHtml += "<ul class='list_sub_ul'>"
+										productListHtml += "<img class='picture' src=" + productCallback[t].imgs[0].path + ">"
+										productListHtml += "<li class='products_description'>"
+										productListHtml += "<input class='inputImg' type='hidden' value='" + productCallback[t].imgs[0].path + "'/>"
+										productListHtml += "<div class='list_sub_title'>" + productCallback[t].proName + "</div>"
+										productListHtml += "<div class='score-sale'>"
+										productListHtml += "<span>价格</span>&nbsp&nbsp<span class='price' style='color:red;'>" + productCallback[t].price + "</span>元</span>"
+										productListHtml += "</div>"
+										productListHtml += "<div class='order-bgHide spms'>" + productCallback[t].remark + "</div>"
+										productListHtml += "</li>"
+										productListHtml += "<img class='purchase_quantity' src='../img/dishesDetail_8.png' />"
+										productListHtml += "<div class='clearBoth'></div>"
+										productListHtml += "</ul>"
+										productListHtml += "<div class='withReducedActivity wiIndex'>"
+										for(io in resultActivity.data) { //活动数据
+											if(productCallback[t].isPresented == true && productCallback[t].isPresented == 1 && resultActivity.data[io].planType == 4 && ca == 'mz') { //买赠
+												productListHtml += "<section style='background-image: url(../img/manzeng.png);'><span>买" + resultActivity.data[io].upToCount + "赠" + resultActivity.data[io].freeCount + "</span></section>"
+											}
+										}
+										productListHtml += "</div>"
+										productListHtml += "<input class='proId' type='hidden' value='" + productCallback[t].proId + "'/>"
+										productListHtml += "</li>"
+									} else if(productCallback[t].proType == 1 && ca == 'zk' && productCallback[t].isDiscount == 1) {
+										productListHtml += "<li class='list_liStyle' data-isSaled='" + productCallback[t].isSaled + "' data-isBargain='" + productCallback[t].isBargain + "' data-isPresented='" + productCallback[t].isPresented + "'  data-isDiscount='" + productCallback[t].isDiscount + "' data-isMoneyOff='" + productCallback[t].isMoneyOff + "' data-planType=''>"
+										productListHtml += "<ul class='list_sub_ul'>"
+										productListHtml += "<img class='picture' src=" + productCallback[t].imgs[0].path + ">"
+										productListHtml += "<li class='products_description'>"
+										productListHtml += "<input class='inputImg' type='hidden' value='" + productCallback[t].imgs[0].path + "'/>"
+										productListHtml += "<div class='list_sub_title'>" + productCallback[t].proName + "</div>"
+										productListHtml += "<div class='score-sale'>"
+										productListHtml += "<span>价格</span>&nbsp&nbsp<span class='price' style='color:red;'>" + productCallback[t].price + "</span>元</span>"
+										productListHtml += "</div>"
+										productListHtml += "<div class='order-bgHide spms'>" + productCallback[t].remark + "</div>"
+										productListHtml += "</li>"
+										productListHtml += "<img class='purchase_quantity' src='../img/dishesDetail_8.png' />"
+										productListHtml += "<div class='clearBoth'></div>"
+										productListHtml += "</ul>"
+										productListHtml += "<div class='withReducedActivity wiIndex'>"
+										for(io in resultActivity.data) { //活动数据
+											if(productCallback[t].isDiscount == true && productCallback[t].isDiscount == 1 && resultActivity.data[io].planType == 1 && ca == 'zk') { //折扣
+												var ratio = resultActivity.data[io].ratio / 10;
+												productListHtml += "<section style='background-image: url(../img/zhekou.png);'>" + ratio + "折</section>"
+											}
+										}
+										productListHtml += "</div>"
+										productListHtml += "<input class='proId' type='hidden' value='" + productCallback[t].proId + "'/>"
+										productListHtml += "</li>"
+									} else if(productCallback[t].proType == 1 && ca == 'tj' && productCallback[t].isBargain == 1) {
+										productListHtml += "<li class='list_liStyle' data-isSaled='" + productCallback[t].isSaled + "' data-isBargain='" + productCallback[t].isBargain + "' data-isPresented='" + productCallback[t].isPresented + "'  data-isDiscount='" + productCallback[t].isDiscount + "' data-isMoneyOff='" + productCallback[t].isMoneyOff + "' data-planType=''>"
+										productListHtml += "<ul class='list_sub_ul'>"
+										productListHtml += "<img class='picture' src=" + productCallback[t].imgs[0].path + ">"
+										productListHtml += "<li class='products_description'>"
+										productListHtml += "<input class='inputImg' type='hidden' value='" + productCallback[t].imgs[0].path + "'/>"
+										productListHtml += "<div class='list_sub_title'>" + productCallback[t].proName + "</div>"
+										productListHtml += "<div class='score-sale'>"
+										productListHtml += "<span>价格</span>&nbsp&nbsp<span class='price' style='color:red;'>" + productCallback[t].price + "</span>元</span>"
+										productListHtml += "</div>"
+										productListHtml += "<div class='order-bgHide spms'>" + productCallback[t].remark + "</div>"
+										productListHtml += "</li>"
+										productListHtml += "<img class='purchase_quantity' src='../img/dishesDetail_8.png' />"
+										productListHtml += "<div class='clearBoth'></div>"
+										productListHtml += "</ul>"
+										productListHtml += "<div class='withReducedActivity wiIndex'>"
+										for(io in resultActivity.data) { //活动数据
+											if(productCallback[t].isBargain == true && productCallback[t].isBargain == 1 && resultActivity.data[io].planType == 3 && ca == 'tj') { //特价
+												productListHtml += "<section style='background-image: url(../img/tejia.png);'>" + resultActivity.data[io].planName + "</section>"
+											}
+										}
+
+										productListHtml += "</div>"
+										productListHtml += "<input class='proId' type='hidden' value='" + productCallback[t].proId + "'/>"
+										productListHtml += "</li>"
+									} else if(productCallback[t].proType == 1 && ca == 'tj' && productCallback[t].isBargain == 1) {
+										productListHtml += "<li class='list_liStyle' data-isSaled='" + productCallback[t].isSaled + "' data-isBargain='" + productCallback[t].isBargain + "' data-isPresented='" + productCallback[t].isPresented + "'  data-isDiscount='" + productCallback[t].isDiscount + "' data-isMoneyOff='" + productCallback[t].isMoneyOff + "' data-planType=''>"
+										productListHtml += "<ul class='list_sub_ul'>"
+										productListHtml += "<img class='picture' src=" + productCallback[t].imgs[0].path + ">"
+										productListHtml += "<li class='products_description'>"
+										productListHtml += "<input class='inputImg' type='hidden' value='" + productCallback[t].imgs[0].path + "'/>"
+										productListHtml += "<div class='list_sub_title'>" + productCallback[t].proName + "</div>"
+										productListHtml += "<div class='score-sale'>"
+										productListHtml += "<span>价格</span>&nbsp&nbsp<span class='price' style='color:red;'>" + productCallback[t].price + "</span>元</span>"
+										productListHtml += "</div>"
+										productListHtml += "<div class='order-bgHide spms'>" + productCallback[t].remark + "</div>"
+										productListHtml += "</li>"
+										productListHtml += "<img class='purchase_quantity' src='../img/dishesDetail_8.png' />"
+										productListHtml += "<div class='clearBoth'></div>"
+										productListHtml += "</ul>"
+										productListHtml += "<div class='withReducedActivity wiIndex'>"
+										for(io in resultActivity.data) { //活动数据
+											if(productCallback[t].isMoneyOff == true && productCallback[t].isMoneyOff == 1 && resultActivity.data[io].planType == 2 && ca == 'mj') { //满减
+												productListHtml += "<section style='background-image: url(../img/manjian.png);'>满" + resultActivity.data[io].upToPrice + "减" + resultActivity.data[io].offPrice + "</section>"
+											}
+										}
+
+										productListHtml += "</div>"
+										productListHtml += "<input class='proId' type='hidden' value='" + productCallback[t].proId + "'/>"
+										productListHtml += "</li>"
+									}
+								}
+								$('.pirdocuts').html(productListHtml);
+								//$('.comma:last-child').css("display", "none");
+
+								//商品详细与口味选择
+								$('.list_liStyle').click(function() {
+									taskeSlectorIndex = $(this).index();
+									orderGoodsName = $(this).find('.list_sub_title').text();
+									detal = $(this).find('.spms').text();
+									var proIdVal = $(this).find('.proId').val();
+									picture = $(this).find('.picture').attr("src");
+									$('.row1_col_1').attr("src", picture);
+									$('.row2_col_2_p1').html(orderGoodsName);
+									$('.row2_detils').html(detal);
+									$('#taske_pirce').html($('.list_liStyle').eq(taskeSlectorIndex).find('.price').text());
+									$('.new_tasteChoose').show();
+									getTask(proIdVal);
+									document.querySelector('.new_tasteChoose').addEventListener('touchmove', bodyScroll, false);
+									jiage = $(this).find('.price').text();
+								})
+							}
+						});
+
+						//品质套餐
+						$('#pztc').click(function() {
+							location.href = 'planList.html';
+						});
+					},
+					complete: function() { //完成响应
+						$('.chooseList').show();
+						$('.loding').hide();
+					}
+				});
+			}
+			getGoods(relatedobj.sh, relatedobj.en, relatedobj.pi);
+
+
+			//加入购物车按钮
+			$('#confirm').click(function() {
+				var jl1_send = '';
+				var jl1_name = '';
+				var jl2_send = 0;
+				var kw1_send = '';
+				var kw1_name = '';
+
+				//加料
+				if($('.row2_type2').length == 0) {
+					$('.row2_type2').html('此商品暂不能加料');
+				} else {
+					$('.row2_type2 li').each(function() {
+						if($(this).hasClass('action_makes')) {
+							jl1_send = $(this).attr("data-id");
+							jl2_send = $(this).attr("data-ingredientprice");
+							jl1_name = $(this).attr("data-name");
+							return false;
+						}
+					});
+				}
+				//口味
+				$('.kw1 li').each(function() {
+					if($(this).hasClass('action_makes')) {
+						kw1_send = $(this).attr("data-id");
+						kw1_name = $(this).attr("data-name");
+						return false;
+					}
+				});
+				var proId_val = $('.list_liStyle').eq(taskeSlectorIndex).find(".proId").val();
+				var proName = $('.list_liStyle').eq(taskeSlectorIndex).find(".list_sub_title").text();
+				var ismoneyoff = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-ismoneyoff"); //满减
+				var isbargain = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-isbargain"); //特价
+				var ispresented = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-ispresented"); //赠送
+				var isdiscount = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-isdiscount"); //打折
+
+				getGoodsArray(jl1_send, jl1_name, jl2_send, kw1_send, kw1_name, ismoneyoff, isbargain, ispresented, isdiscount,proId_val,proName);
+				getShopCatNum();
+				$('#explain,.new_tasteChoose').hide();
+				document.querySelector('.new_tasteChoose').removeEventListener('touchmove', bodyScroll, false);
+			});
+
+			$('.close').click(function() {
+				document.querySelector('.priMask').removeEventListener('touchmove', bodyScroll, false);
+				$('.priMask').hide();
+			})
+
+			$('#cancel').click(function() {
+				$('.new_tasteChoose').hide();
+				document.querySelector('.new_tasteChoose').removeEventListener('touchmove', bodyScroll, false);
+			});
+		</script>
+	</body>
+
+</html>

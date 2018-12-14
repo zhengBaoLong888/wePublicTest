@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+		<title>套餐详细</title>
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/taocanDetails.css" />
+		<style>
+
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<article class="dishesHeader">
+				<aside class="commenBack-head">
+					<a id="back" onclick="history.back();">菜品详细</a>
+				</aside>
+				<div class="dishes-banner"><img id="pourctImg" src="../img/1.png" /></div>
+				<div class="dishes-item">
+					<div class="dishes-item-left">
+						<p id="shopName"></p>
+						<p class="dir-price">￥<span id="price"></span><span id="orgPri"></span></span><span class="label">推荐</span></p>
+						<p id="remake"></p>
+						<!--<p class="ms">采用新鲜西瓜榨汁，无添加，纯天然，夏季不二的选择</p>-->
+						<input id="tc_id" type="hidden" value="" />
+						<input id="tc_zk" type="hidden" value="" />
+						<input id="tc_mj" type="hidden" value="" />
+						<input id="tc_tj" type="hidden" value="" />
+						<input id="tc_mz" type="hidden" value="" />
+						<!--<input id="originalPrice" type="hidden" value="" />-->
+						<!--<input type='text' class='spinnerExample' disabled="disabled" value="0" />-->
+						<div id="selectOr">加入购物车</div>
+					</div>
+
+					<ul>
+						<li style="position: relative;">
+							<a class="diyIcon" onclick="jumpPage();">
+								<!--<img id="catIcon" class="" src="../img/index_shoppingCart.png" />-->
+								<div style="position: relative;">
+									<div id="count">0</div>
+								</div>
+							</a>
+							<p class="p-title">自定义套餐其他商品</p>
+							<div class="btn-hfmr"><span>恢复默认套餐</span></div>
+							<div class="tcd-row">
+
+							</div>
+						</li>
+					</ul>
+					<div class="dishes-evaluation">
+						<p>商品评价<span>(好评率100%)</span></p>
+						<p>1条评价</p>
+					</div>
+				</div>
+			</article>
+
+			<aside class="changeGoods">
+				<div class="list">
+					<p class="list_1">商品更换为</p>
+					<ul class="list_2">
+
+					</ul>
+					<div class="mui-btn mui-btn-primary abolish">返回</div>
+				</div>
+			</aside>
+
+			<!--选择口味弹窗-->
+			<aside class="new_tasteChoose">
+				<div class="row1">
+					<div class="row1_goodsName">
+						<img class="row1_col_1" src="" />
+						<div class="row2_col_2">
+							<p class="row2_col_2_p1">西瓜沙冰</p>
+							<div class="row2_col_2_p2" style="display: none;">价格:<span>¥</span><span id="taske_pirce">15</span></div>
+						</div>
+					</div>
+					<input id="numCount" type="hidden" value="1" />
+					<div class="row2">
+						<p>规格</p>
+						<ul class="row2_type1 zf1"></ul>
+						<ul class="zf2"></ul>
+						<div class="clearBoth"></div>
+						<p>加料</p>
+						<ul class="row2_type2"></ul>
+						<div class="clearBoth"></div>
+						<p>口味</p>
+						<ul class="row2_type3 kw1"></ul>
+						<ul class="kw2"></ul>
+						<div class="clearBoth"></div>
+					</div>
+
+					<div class="row3">
+						<span id="cancel">取消</span>
+						<span id="confirm">确定</span>
+					</div>
+				</div>
+			</aside>
+
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../js/script.js" ></script>
+		<script type="text/javascript" src="../js/spinner.js"></script>
+		<script>
+			var taocanList = JSON.parse(localStorage.getItem("products")); //套餐列表
+			var relatedobj = JSON.parse(localStorage.getItem("reltArray")); //门店、品牌、企业id
+			var getTaocanProIdVariable = JSON.parse(localStorage.getItem("taocanProIdVariable")); //套餐proId
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var base = localStorage.getItem("base");
+			var html = '';
+			var html2 = '';
+			var indexDiv = '';
+			var tasteIndex = '';
+			var taste_proId = ''; //选择口味
+			var random = 0; //orderID
+			var priceYou = 0;
+			var shoujia = 0;
+			
+			console.log(taocanList);
+
+			function uuid() {
+				var s = [];
+				var hexDigits = "0123456789abcdef";
+				for(var i = 0; i < 30; i++) {
+					s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+				}
+				s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+				s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+				s[8] = s[13] = s[18] = s[23];
+
+				var uuid = s.join("");
+				return uuid;
+			}
+			var ican = uuid();
+			console.log(ican);
+
+			$(function() {
+				var htmlHeight = $('body').height();
+				$('.tasteChoose').css('height', htmlHeight);
+			});
+
+			$('.spinnerExample').spinner({});
+
+			//获取当前时间
+			var myDate = new Date();
+			var year = myDate.getFullYear();
+			var month = myDate.getMonth() + 1;
+			var dataNum = myDate.getDate();
+			var hours = myDate.getHours();
+			var minutes = myDate.getMinutes();
+			var seconds = myDate.getSeconds();
+			var colData = year + "-" + month + "-" + dataNum + " " + hours + ":" + minutes + ":" + seconds;
+
+			function getTc() {
+				for(vb in taocanList) {
+					if(taocanList[vb].proType == 2 && taocanList[vb].proId == getTaocanProIdVariable) {
+						$('#tc_id').val(taocanList[vb].proId);
+						$('#pourctImg').attr("src", taocanList[vb].imgs[0].path);
+						$('#shopName').html(taocanList[vb].proName);
+						if(taocanList[vb].isBargain == 1){
+							priceYou = taocanList[vb].price;
+							$('#price').html(taocanList[vb].price);
+							$('#orgPri').html("原价" + taocanList[vb].origionPrice);
+						}else{
+							priceYou = taocanList[vb].origionPrice;
+							$('#price').html(taocanList[vb].origionPrice);
+						}
+						$('#remake').html(taocanList[vb].remark);
+						$('#tc_zk').val(taocanList[vb].isDiscount);
+						$('#tc_mj').val(taocanList[vb].isMoneyOff);
+						$('#tc_tj').val(taocanList[vb].isBargain);
+						$('#tc_mz').val(taocanList[vb].isPresented);
+					}
+				}
+			}
+			getTc();
+			//计算总数量
+			function getShopCatNum() {
+				var numCould = 0;
+				var getArray = JSON.parse(localStorage.getItem("dataList"));
+				console.log(getArray);
+				if(getArray == null || getArray == '') {
+					$('#count').html('0');
+				} else {
+					for(iq in getArray) {
+						numCould += getArray[iq].num;
+					}
+					$('#count').html(numCould);
+				}
+			}
+
+			getShopCatNum();
+			window.addEventListener('pageshow', function() {
+				getShopCatNum();
+			});
+
+			function priceat() {
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					data: {
+						"shopID": relatedobj.sh,
+						"enterpriseID": relatedobj.en,
+						"pinpaiID": relatedobj.pi,
+						"proID": getTaocanProIdVariable
+					},
+					url: base + "sale_inte/consumers/package.action",
+					ContentType: "application/json",
+					success: function(result) {
+						console.log(result);
+						for(w in result.data) {
+							html += "<div class='mdjsj' data-isChanaged='" + result.data[w].isChanaged + "'>"
+							html += "<img class='tcd-row-col1' src='" + result.data[w].imgs[0].path + "' >"
+							html += "<div class='tcd-row-col2'>"
+							html += "<p class='p1'>" + result.data[w].proName + "</p>"
+							html += "<p class='p2'>"
+							html += "<span class='mr'>默认</span>"
+							html += "<span class='A1  unifiedIos'></span>"
+							html += "<span class='nbsp'></span>"
+							html += "<span class='A2 unifiedIos'></span>"
+							html += "<span class='nbsp'></span>"
+							html += "<span class='A3 unifiedIos'></span>"
+							html += "<span class='nbsp'></span>"
+							html += "<span class='A4 unifiedIos'></span>"
+							html += "<span class='nbsp'></span>"
+							html += "<span class='A5 unifiedIos'></span>"
+							html += "</p>"
+							html += "</div>"
+							html += "<input class='idVal' type='hidden' value='" + result.data[w].proId + "'>" //proId
+							if(result.data[w].parentId == null){
+								html += "<input class='parentId' type='hidden' value='" + result.data[w].id + "'>" //id
+							}else{
+								html += "<input class='parentId' type='hidden' value='" + result.data[w].parentId + "'>" //parentId
+							}
+							
+							html += "<input class='idClass' type='hidden' value='" + result.data[w].id + "'>" //id
+							html += "<input type='hidden' value='" + result.data[w].proName + "'/>"
+							html += "<input class='addDefent' type='hidden' value='0'>" //更换商品加价id
+							html += "<input class='jl1_send' type='hidden' value=''>" //加料id
+							html += "<input class='jl2_send' type='hidden' value='0'>" //加料价格
+							html += "<input class='jl1_name' type='hidden' value=''>" //加料名称
+							html += "<input class='kw1_send' type='hidden' value=''>" //口味1id
+							html += "<input class='kw1_name' type='hidden' value=''>" //口味1名称
+							html += "<div class='taste-btn replaceGoods'>更换商品</div>"
+							html += "<div class='taste-btn taste-btn2' style='margin-left: 20px;'>口味选择</div>"
+							html += "</div>"
+						}
+						$('.tcd-row').html(html);
+
+						$('.mdjsj').each(function(index) {
+							var mdjsjIndex = index;
+							var isChanaged = $(this).attr("data-isChanaged");
+							if(isChanaged == 0) {
+								$(this).find('.replaceGoods').hide();
+							} else {
+
+							}
+						})
+
+						//计算价格
+						function calculatePrice() {
+							var ghProductPrice = 0;
+							var jlProductPrice = 0;
+							$('.mdjsj').each(function() {
+								ghProductPrice += Number($(this).find('.addDefent').val()); //更换商品价格
+								jlProductPrice += Number($(this).find('.jl2_send').val()); //加料价格
+							})
+							var taocanTotlePrice = Number(priceYou) + Number(ghProductPrice) + Number(jlProductPrice);
+							$('#price').html(taocanTotlePrice.toFixed(2));
+						}
+						//calculatePrice();
+
+						function getListGoods(_id) { //更换商品
+							$('.changeGoods').show();
+							$.ajax({
+								type: "post",
+								headers: {
+									"Content-Type": "application/x-www-form-urlencoded",
+									"Authorization": Authorization
+								},
+								url: base + "sale_inte/consumers/replaceGoods.action",
+								data: {
+									"shopID": relatedobj.sh,
+									"enterpriseID": relatedobj.en,
+									"pinpaiID": relatedobj.pi,
+									"replaceId": _id
+								},
+								ContentType: "application/json",
+								success: function(result) {
+									console.log(result);
+									if(result.data.length == 0) {
+										$('.list_2').html("<span class='have'>此商品不能更换哦 ~</span>");
+									} else {
+										html2 = '';
+										for(j in result.data) {
+											html2 += "<li>"
+											html2 += "<img src='" + result.data[j].imgs[0].path + "' >"
+											html2 += "<p>" + result.data[j].proName + "</p>"
+											html2 += "<p>+" + result.data[j].diffPrice + "元</p>"
+											html2 += "<input class='taocanChildGood' type='hidden' value='" + result.data[j].proId + "'/"
+											html2 += "</li>"
+										}
+										$('.list_2').html(html2);
+									}
+
+									$('.list_2 li').click(function() {
+										var indexpl = $(this).index();
+										var g_img = result.data[indexpl].imgs[0].path;
+										var g_name = result.data[indexpl].proName;
+										var g_diffPrice = result.data[indexpl].diffPrice;
+										var g_proId = result.data[indexpl].proId;
+										var g_Id = result.data[indexpl].id;
+										var g_comboId = result.data[indexpl].proComboId;
+										var g_parentId = result.data[indexpl].parentId
+
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.p1').html(g_name);
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.tcd-row-col1').attr("src", g_img);
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.idVal').val(g_proId);
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.addDefent').val(g_diffPrice); //加价价格
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.idClass').val(g_Id);
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.comId').val(g_comboId);
+										$('.tcd-row').find('.mdjsj').eq(indexDiv).find('.comId').val(g_parentId);
+
+										$('.mdjsj').eq(indexDiv).find('.mr').show();
+										$('.mdjsj').eq(indexDiv).find('.unifiedIos').html('');
+										$('.changeGoods').hide();
+										calculatePrice();
+									})
+								}
+							});
+						}
+
+						//选择口味
+						function getTask() {
+							$.ajax({
+								type: "post",
+								headers: {
+									"Content-Type": "application/x-www-form-urlencoded",
+									"Authorization": Authorization
+								},
+								url: base + "sale_inte/product/tasteChoose.action",
+								data: {
+									"pinpaiID": relatedobj.pi,
+									"proId": taste_proId
+								},
+								ContentType: "application/json",
+								success: function(result) {
+									var cpList = JSON.parse(localStorage.getItem("products"));
+									console.log(result);
+									var ge1 = '';
+									var tasteHtml2 = '';
+									var kw1 = '';
+									var kw2 = '';
+
+									//规格
+									for(gg in cpList) {
+										if(cpList[gg].proId == taste_proId) {
+											var scaleIdVar = cpList[gg].scaleId;
+											for(gg2 in result.data.scales) {
+												if(result.data.scales[gg2].scaleId == scaleIdVar) {
+													ge1 += "<li style='background-color:#ff5d00 !important' data-name='" + result.data.scales[gg2].scaName + "' data-id='" + result.data.scales[gg2].scaleId + "'>" + result.data.scales[gg2].scaName + "</li>"
+													$('.zf1').html(ge1);
+												}
+											}
+										}
+									}
+
+									//加料
+									if(result.data.mats.length == 0 || result.data.mats.ingredientDosage == 0 || result.data.mats.ingredientDosage == null) {
+										$('.row2_type2').html("<div class='inform'>此商品暂无加料</div>");
+									} else {
+										for(s in result.data.mats) {
+											tasteHtml2 += "<li data-name='" + result.data.mats[s].matName + "' data-id='" + result.data.mats[s].proMatId + "' data-ingredientPrice='" + result.data.mats[s].ingredientPrice + "'>" + "<span class='defaultTaste'>" + result.data.mats[s].matName + "</span>" + "<span class='jiage'>+" + result.data.mats[s].ingredientPrice + "元</span>" + "</li>"
+										}
+										$('.row2_type2').html(tasteHtml2);
+									}
+
+									//口味
+									for(kw in cpList) {
+										if(cpList[kw].proId == taste_proId) {
+											if(cpList[kw].tastes.length == 0) {
+												$('.kw1').html("<div class='inform'>此商品暂无口味</div>");
+											} else {
+												var tasteGroupId = cpList[kw].tastes[0].tasteGroupId;
+												for(kwTwo in result.data.tastes) {
+													if(result.data.tastes[kwTwo].groupId == tasteGroupId) {
+														kw1 += "<li data-name='" + result.data.tastes[kwTwo].tasteName + "' data-id='" + result.data.tastes[kwTwo].tasteId + "'>" + result.data.tastes[kwTwo].tasteName + "</li>"
+														$('.kw1').html(kw1);
+													}
+												}
+											}
+											$('.kw1 li:first-child').addClass("action_makes");
+										}
+									}
+
+									//选择口味按钮样式
+									$('.kw1 li').click(function() {
+										$(this).addClass('action_makes').siblings().removeClass('action_makes');
+									});
+									$('.row2_type2 li').click(function() {
+										var thisName = $(this).attr("class");
+										if(thisName == 'action_makes') {
+											$(this).removeClass('action_makes');
+											var yuan = $('#taske_pirce').html();
+											var tianjia = $(this).find('.jiage').text().substr(1, 1);
+											var hou = yuan - tianjia;
+											var jia = hou.toFixed(2); //保留两位
+											$('#taske_pirce').html(jia);
+										} else {
+											$(this).addClass('action_makes').siblings().removeClass('action_makes');
+											var tianjia = $(this).find('.jiage').text().substr(1, 1)
+											shoujia = Number(jiage) + Number(tianjia);
+											$('#taske_pirce').html(shoujia);
+										}
+									})
+								}
+							});
+						}
+
+						//确定更换口味
+						$('#confirm').click(function() {
+							var jl1_send = '';
+							var jl1_name = '';
+							var kw1_send = '';
+							var kw1_name = '';
+							var jl2_send = 0;
+
+							//加料
+							if($('.row2_type2').length == 0) {
+								$('.row2_type2').html('此商品暂不能加料');
+							} else {
+								$('.row2_type2 li').each(function() {
+									if($(this).hasClass('action_makes')) {
+										jl1_send = $(this).attr("data-id");
+										jl2_send = $(this).attr("data-ingredientprice");
+										jl1_name = $(this).attr("data-name");
+										return false;
+									}
+								});
+							}
+							//口味1
+							$('.kw1 li').each(function() {
+								if($(this).hasClass('action_makes')) {
+									kw1_send = $(this).attr("data-id");
+									kw1_name = $(this).attr("data-name");
+									return false;
+								}
+							});
+
+							$('.mdjsj').eq(tasteIndex).find('.jl1_send').val(jl1_send);
+							$('.mdjsj').eq(tasteIndex).find('.jl2_send').val(jl2_send);
+							$('.mdjsj').eq(tasteIndex).find('.jl1_name').val(jl1_name);
+							$('.mdjsj').eq(tasteIndex).find('.kw1_send').val(kw1_send);
+							$('.mdjsj').eq(tasteIndex).find('.kw1_name').val(kw1_name);
+
+							$('.mdjsj').eq(tasteIndex).find('.mr').hide();
+							$('.mdjsj').eq(tasteIndex).find('.A1').html(jl1_name);
+							$('.mdjsj').eq(tasteIndex).find('.A2').html(kw1_name);
+							$('#explain,.new_tasteChoose').hide();
+							calculatePrice();
+						});
+
+						$('.taste-btn2').click(function() {
+							taste_proId = $(this).siblings('.idVal').val();
+							tasteIndex = $(this).parents('.mdjsj').index();
+							$('.new_tasteChoose').show();
+							var src = $('.mdjsj').eq(tasteIndex).find(".tcd-row-col1").attr("src");
+							var nameLo = $('.mdjsj').eq(tasteIndex).find(".p1").text();
+							$('.row1_col_1').attr("src", src);
+							$('.row2_col_2_p1').html(nameLo);
+							getTask();
+						})
+
+						//更换商品按钮
+						$('.replaceGoods').click(function() {
+							var idClass = $(this).siblings('.idClass').val(); //获取id号
+							indexDiv = $(this).parents('.mdjsj').index();
+							getListGoods(idClass);
+						})
+
+						//加入购物车
+						$('#selectOr').click(function() {
+							var dataTaoCanArray = [];
+							var dataObject = {};
+							$('.mdjsj').each(function() {
+								var dataTaoCan = {};
+								var makes = [];
+								var mats = [{
+									proMatId: $(this).find('.jl1_send').val(),
+									matsName: $(this).find('.jl1_name').val(),
+									matShopPirce: $(this).find('.jl2_send').val()
+								}];
+								var tastes = [{
+									tasteId: $(this).find('.kw1_send').val(),
+									tastesName: $(this).find('.kw1_name').val()
+								}]
+								dataTaoCan = {
+									proId: $(this).find('.idVal').val(),
+									id: $(this).find('.parentId').val(),
+									sexname: $(this).find('.p1').text(),
+									addDefig:$(this).find('.addDefent').val(),
+									makes,
+									mats,
+									tastes
+								}
+								dataTaoCanArray.push(dataTaoCan);
+							})
+							dataObject = {
+								proId: $('#tc_id').val(),
+								proType: 2,
+								num: 1,
+								goodsProName: $('#shopName').text(),
+								isDiscount:$('#tc_zk').val(),
+								isMoneyOff:$('#tc_mj').val(),
+								isBargain:$('#tc_tj').val(),
+								isPresented:$('#tc_mz').val(),
+								dataTaoCanArray
+							}
+							console.log(dataObject);
+							var addTaoCan = JSON.parse(localStorage.getItem("dataList"));
+							addTaoCan.push(dataObject);
+							localStorage.setItem("dataList", JSON.stringify(addTaoCan));
+							getShopCatNum();
+						})
+					}
+				});
+			}
+			priceat();
+			//取消按钮
+
+			$('.btn-hfmr').click(function() {
+				location.reload();
+			})
+
+			$('#cancel').click(function() {
+				$('.new_tasteChoose').hide();
+			});
+			//更换商品取消按钮
+			$('.abolish').click(function() {
+				$('.changeGoods').hide();
+			})
+		</script>
+	</body>
+
+</html>

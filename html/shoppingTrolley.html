@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+	<title>购物车</title>
+	<link href="../css/mui.css" rel="stylesheet" />
+	<link rel="stylesheet" href="../css/commen.css" />
+	<link rel="stylesheet" href="../css/shoppingTrolley.css" />
+</head>
+
+<body class="entirety-bg">
+	<div class="marksYdn"><span>请稍后...</span></div>
+	<div class="mui-content">
+		<div class="content-overall commen-style">
+			<aside class="commenBack-head">
+				<a id="shopBack" onclick="history.back();">购物车</a>
+			</aside>
+			<div class="store-name">
+				<span class="dianPuName"></span>
+				<span class="clear">清空</span>
+			</div>
+			<div id="dd-page">
+				<div class="shopCatList">
+
+				</div>
+				<div class="show">购物车还是空的哦~</div>
+				<div class="coupons">
+					<span>选择优惠券</span>
+					<div class="numAva"><span id="available">0</span>张可用</div>
+					<img id="yhjImg" src="../img/comment_3.png" />
+				</div>
+
+				<div class="selectPreferentialActivities">
+					<p id="spaTitle">请选择以下活动：</p>
+					<form action="" method="post">
+						<div class="FavorableBlock no" id="p_mz">
+							<div class="setFlex">
+								<input data-val="3" name="Fruit" type="radio" value="mz" /><label>参加满赠后优惠的价格：<span class="preferentialPirce" id="another_mz">0</span></label>
+							</div>
+						</div>
+
+						<div class="FavorableBlock no" id="p_mj">
+							<div class="setFlex">
+								<input data-val="2" name="Fruit" type="radio" value="mj" /><label>参加满减后优惠的价格：<span class="preferentialPirce" id="another_mj">0</span></label>
+							</div>
+						</div>
+
+						<div class="FavorableBlock no" id="p_zk">
+							<div class="setFlex">
+								<input data-val="1" name="Fruit" type="radio" value="zk" /><label>参加折扣后优惠的价格：<span class="preferentialPirce" id="another_zk">0</span></label>
+							</div>
+						</div>
+						<div class="FavorableBlock no" id="p_tj">
+							<div class="setFlex">
+								<input data-val="4" name="Fruit" type="radio" value="tj" /><label>参加特价后优惠的价格：<span class="preferentialPirce" id="another_tj">0</span></label>
+							</div>
+						</div>
+						<div class="FavorableBlock" id="coupsDiv">
+							<div class="setFlex">
+								<input id="coups" data-val="false" name="Fruit" type="radio" value="yhj" /><label>使用优惠券后优惠的价格：<span class="preferentialPirce"
+									 id="another_yhj">未选择优惠券</span></label>
+							</div>
+						</div>
+						<div class="FavorableBlock no" id="p_noHd">
+							<div class="setFlex">
+								<input data-val="2" name="Fruit" type="radio" value="refused"><label>不参加任何活动：<span class="preferentialPirce" id="another_refused">0</span></label>
+							</div>
+						</div>
+					</form>
+				</div>
+
+				<article class="js-btn">
+					<span>合计:</span>
+					<span id="combined" style="color:#f90d0d;padding: 0 40px 0 15px;">0</span>
+					<span class="settlement">去结算</span>
+				</article>
+
+				<article class="js-btn2">
+					<span class="settlement2">去结算</span>
+				</article>
+			</div>
+
+			<article class="marks">
+				<div class="panel">
+					<ul class="panel_ul">
+
+					</ul>
+				</div>
+				<div class="row3">
+					<span id="cancel">取消</span>
+					<span id="confirm" onclick="getCoupons();">确定</span>
+				</div>
+			</article>
+		</div>
+	</div>
+	<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+	<script type="text/javascript" src="../js/mui.min.js"></script>
+	<script type="text/javascript" src="../js/script.js"></script>
+	<script>
+		mui.init();
+		var localityDataList = JSON.parse(localStorage.getItem('dataList')); //购物车基础数组
+		var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+		var products = JSON.parse(localStorage.getItem("products"));
+		var token = localStorage.getItem("token");
+		var Authorization = "Bearer " + token;
+		var base = localStorage.getItem("base");
+		var html = '';
+		var highestData = {};
+		var jishu = [];
+		var jsCount = 0;
+		//获取当前时间
+		var colData = getDate();
+		console.log(localityDataList);
+
+		function uuid() {
+			var s = [];
+			var hexDigits = "0123456789abcdef";
+			for (var i = 0; i < 30; i++) {
+				s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+			}
+			s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+			s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+			s[8] = s[13] = s[18] = s[23];
+			var uuid = s.join("");
+			return uuid;
+		}
+		var ican = uuid();
+
+		$('.dianPuName').html(relatedobj.sn);
+
+		//购物车列表 start
+		if (localityDataList.length == 0) {
+			$('.show').show();
+		} else {
+			$('.show').hide();
+			for (var i = 0; i < localityDataList.length; i++) {
+				var dataProId = localityDataList[i].proId;
+				if (localityDataList[i].proType == 1) {
+					//						var itemPirce, totalPirce;
+					html += "<div class='shopCardetails_row2' data-proId = '" + localityDataList[i].proId + "' data-playType = '" +
+						localityDataList[i].proType + "'>"
+					html += "<div class='shopCarCol-1'>"
+					html += "<div class='layout-felx'>"
+
+					html += "<span class='goodsName' data-relName='" + localityDataList[i].goodsProName + "'>" + localityDataList[i].goodsProName +
+						"</span>"
+					if (localityDataList[i].isDz == 1) {
+						html += "<img class='shopCat-img' src='../img/zhekou.png'/>"
+					}
+					if (localityDataList[i].isMz == 1) {
+						html += "<img class='shopCat-img' src='../img/manzeng.png'/>"
+					}
+					if (localityDataList[i].isMj == 1) {
+						html += "<img class='shopCat-img' src='../img/manjian.png'/>"
+					}
+					if (localityDataList[i].isTj == 1) {
+						html += "<img class='shopCat-img' src='../img/tejia.png'/>"
+					}
+					html += "</div>"
+					html += "<p class='goodsTasker'></p>"
+					for (a in localityDataList[i].makes) {
+						html += "<span class='tasteGroup'>" + localityDataList[i].makes[a].makesName + "</span>"
+						html += "    "
+					}
+					for (b in localityDataList[i].mats) {
+						html += "<span class='tasteGroup'>" + localityDataList[i].mats[b].matsName + "</span>"
+						html += "    "
+					}
+					for (c in localityDataList[i].tastes) {
+						html += "<span class='tasteGroup'>" + localityDataList[i].tastes[c].tastesName + "</span>"
+						html += "    "
+					}
+					html += "</div>"
+					if (localityDataList[i].mats[0].matShopPirce == '') {
+						html += "<input class='shop_addUp' type='hidden' value='0' />" //加价
+					} else {
+						html += "<input class='shop_addUp' type='hidden' value='" + localityDataList[i].mats[0].matShopPirce + "' />" //加价
+					}
+
+					for (item in products) {
+						if (products[item].proType == 1 && products[item].proId == dataProId) {
+							html += "<input class='mz hd' type='hidden' value='" + products[item].isPresented + "' />" //满赠
+							html += "<input class='tj hd' type='hidden' value='" + products[item].isBargain + "' />" //特价
+							html += "<input class='zk hd' type='hidden' value='" + products[item].isDiscount + "' />" //折扣
+							html += "<input class='mj hd' type='hidden' value='" + products[item].isMoneyOff + "' />" //满减
+						}
+
+						if (products[item].proId == dataProId) { //商品与购物车商品比较
+							if (products[item].isBargain == 1) {
+								var itemPirce = Number(localityDataList[i].mats[0].matShopPirce) + Number(products[item].price); //销售价单价
+								var origionPrice = Number(localityDataList[i].mats[0].matShopPirce) + Number(products[item].origionPrice); //原价单价
+								html += "<div class='pirceA'>"
+								html += "<span class='shopPirce itemPirce' data-itemPirce='" + itemPirce.toFixed(2) + "'>" + itemPirce.toFixed(
+									2) + "</span>"
+								html += "<p class='orgPri'>"
+								html += "<span>原价￥</span><span class='origionPrice' data-origionPrice='" + origionPrice.toFixed(2) + "'>" +
+									origionPrice.toFixed(2) + "</span>"
+								html += "</p>"
+								html += "</div>"
+							} else {
+								var origionPrice = Number(localityDataList[i].mats[0].matShopPirce) + Number(products[item].origionPrice); //单价
+								//var	totalPirce = localityDataList[i].num * itemPirce; //总价
+								html += "<div class='pirceA'>￥<span class='shopPirce origionPrice' data-origionPrice='" + origionPrice.toFixed(
+									2) + "'>" + origionPrice.toFixed(2) + "</span></div>"
+							}
+						}
+					}
+
+					html += "<div class='ShopSpinner'>"
+					html += "<button class='decrease'>-</button>"
+					html += "<input type='text' class='shopSpinnerInput' value='" + localityDataList[i].num +
+						"' disabled='disabled'/>"
+					html += "<button class='increase'>+</button>"
+					html += "</div>"
+					html += "</div>"
+					html += "</div>"
+				} else if (localityDataList[i].proType == 2) {
+					var addDefig = 0;
+					var matsGos = 0;
+					html += "<div class='shopCardetails_row2' data-proId = '" + localityDataList[i].proId + "' data-playType = '" +
+						localityDataList[i].proType + "'>"
+					html += "<div class='shopCarCol-1'>"
+					html += "<div class='flex'>"
+					html += "<span class='goodsName' data-relName='" + localityDataList[i].goodsProName + "'>" + localityDataList[i].goodsProName +
+						"</span>"
+					if (localityDataList[i].isDiscount == 1) {
+						html += "<img class='shopCat-img' src='../img/zhekou.png'/>"
+					}
+					if (localityDataList[i].isPresented == 1) {
+						html += "<img class='shopCat-img' src='../img/manzeng.png'/>"
+					}
+					if (localityDataList[i].isMoneyOff == 1) {
+						html += "<img class='shopCat-img' src='../img/manjian.png'/>"
+					}
+					if (localityDataList[i].isBargain == 1) {
+						html += "<img class='shopCat-img' src='../img/tejia.png'/>"
+					}
+					html += "</div>"
+					html += "<p class='goodsTasker'></p>"
+					for (a in localityDataList[i].dataTaoCanArray) {
+						html += "<span class='tasteGroup'>" + localityDataList[i].dataTaoCanArray[a].sexname + "</span>"
+						html += "    "
+					}
+					html += "</div>"
+					//						html += "<input class='shop_addUp' type='hidden' value='0' />" //加价
+					for (hdItem in products) {
+						if (products[hdItem].proType == 2 && products[hdItem].proId == dataProId) {
+
+							html += "<input class='mz hd' type='hidden' value='" + products[hdItem].isPresented + "' />" //满赠
+							html += "<input class='tj hd' type='hidden' value='" + products[hdItem].isBargain + "' />" //特价
+							html += "<input class='zk hd' type='hidden' value='" + products[hdItem].isDiscount + "' />" //折扣
+							html += "<input class='mj hd' type='hidden' value='" + products[hdItem].isMoneyOff + "' />" //满减
+
+							for (var q = 0; q < localityDataList[i].dataTaoCanArray.length; q++) {
+								addDefig += Number(localityDataList[i].dataTaoCanArray[q].addDefig);
+								matsGos += Number(localityDataList[i].dataTaoCanArray[q].mats[0].matShopPirce);
+							}
+
+							var taocanTP = Number(addDefig) + Number(matsGos); //更换商品和加料总价
+
+							if (products[hdItem].isBargain == 1) {
+								var itemPirce = Number(taocanTP) + Number(products[hdItem].price); //销售价单价
+								var origionPrice = Number(taocanTP) + Number(products[hdItem].origionPrice); //原价单价
+								html += "<div class='pirceA'>"
+								html += "<span class='shopPirce itemPirce' data-itemPirce='" + itemPirce.toFixed(2) + "'>" + itemPirce.toFixed(
+									2) + "</span>"
+								html += "<p class='orgPri'>"
+								html += "<span>原价￥</span><span class='origionPrice' data-origionPrice='" + origionPrice.toFixed(2) + "'>" +
+									origionPrice.toFixed(2) + "</span>"
+								html += "</p>"
+								html += "</div>"
+							} else {
+								var origionPrice = Number(taocanTP) + Number(products[hdItem].origionPrice); //单价
+								html += "<div class='pirceA'>￥<span class='shopPirce origionPrice' data-origionPrice='" + origionPrice.toFixed(
+									2) + "'>" + origionPrice.toFixed(2) + "</span></div>"
+							}
+						}
+
+					}
+
+					html += "<div class='ShopSpinner'>"
+					html += "<button class='decrease'>-</button>"
+					html += "<input disabled='disabled' type='text' class='shopSpinnerInput' value='" + localityDataList[i].num +
+						"' />"
+					html += "<button class='increase'>+</button>"
+					html += "</div>"
+					html += "</div>"
+					html += "</div>"
+
+				}
+				$('.shopCatList').html(html);
+			}
+		} //购物车列表 end
+
+		function couponPrice(_jsCount) { //优惠券类型
+			if (_jsCount == 1) {
+				if ($('.actionTF').attr("data-coutype") == 1) {
+					var couType = $('.actionTF').attr("data-discount");
+					var totalPricejf = $('#combined').text();
+					var jhjg = Number(totalPricejf) - Number(couType);
+					if (jhjg < 0) {
+						$('#combined').html(0.00);
+					} else {
+						$('#combined').html(jhjg.toFixed(2));
+					}
+				} else if ($('.actionTF').attr("data-coutype") == 2) {
+					var ntert = [];
+					$('.shopCardetails_row2').each(function () {
+						if ($(this).attr("data-playtype") == 1) {
+							ntert.push($(this).find('.shopPirce').attr("data-itempirce"));
+						}
+					})
+					var maxVal = Math.max.apply(null, ntert);
+					var ComplimentaryFinalValue = Number($('#combined').text()) - Number(maxVal);
+					$('#combined').html(ComplimentaryFinalValue.toFixed(2));
+				}
+			}
+		}
+
+		$('.js-btn2').show();
+		var resultData;
+
+		function getpromotion() {
+			$.ajax({
+				type: "post",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": Authorization
+				},
+				data: {
+					"shopID": relatedobj.sh,
+					"enterpriseID": relatedobj.en,
+					"pinpaiID": relatedobj.pi
+				},
+				url: base + "sale_inte/salespromotion/getpromotion.action",
+				async: false,
+				success: function (result) {
+					console.log(result);
+					resultData = result.data;
+				}
+			});
+		}
+		getpromotion();
+
+		//满赠
+		function buyGift() {
+			var uc = 0;
+			var fe = 0;
+			var ner = 0;
+			var tolPri = 0;
+			var minusPrice = 0;
+			var temp = 9999;
+			var ultimatePrice = 0;
+			var activityArray = [];
+			$('.shopCardetails_row2').each(function () {
+				var mzVal = $(this).find('.mz').val();
+				if (mzVal == 1) {
+					var gdId = $(this).attr("data-proId");
+					var tpr = $(this).find('.origionPrice').attr("data-origionPrice");
+					var gdname = $(this).find('.goodsName').attr("data-relName");
+					var spinner = $(this).find('.shopSpinnerInput').val();
+					var productObj = {
+						ogdId: gdId,
+						otpr: tpr,
+						ogdname: gdname,
+						nums: spinner
+					}
+					activityArray.push(productObj);
+
+				}
+			});
+			if (resultData.length == 0) {
+				for (var i = 0; i < activityArray.length; i++) {
+					ultimatePrice += activityArray[i].nums * activityArray[i].otpr;
+				}
+			} else {
+				for (var i = 0; i < activityArray.length; i++) {
+					ner += Number(activityArray[i].nums); //总数量
+					tolPri += Number(activityArray[i].otpr) * Number(activityArray[i].nums); //总价
+				};
+				for (l in resultData) {
+					if (resultData[l].planType == 4) {
+						var x = resultData[l].upToCount;
+						var y = resultData[l].freeCount;
+						var v = ner - x - y;
+						if (v < 0) {
+							v = 0;
+						} else {}
+						var z = x + v;
+
+						if (z < temp) {
+							temp = z;
+							uc = resultData[l].upToCount;
+							fe = resultData[l].freeCount;
+						}
+					}
+				};
+				var compare = function (obj1, obj2) {
+					var val1 = obj1.otpr;
+					var val2 = obj2.otpr;
+					if (val1 < val2) {
+						return -1;
+					} else if (val1 > val2) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+				activityArray.sort(compare);
+				var replaceTemp = ner - temp; //赠送杯数 
+				var totNum = uc + fe;
+				if (ner < totNum) {
+					ultimatePrice = tolPri;
+				} else {
+					for (var j = 0; j < activityArray.length; j++) {
+						if (activityArray[j].nums >= replaceTemp) {
+							tolPri = tolPri - Number(activityArray[j].otpr) * replaceTemp; //减去价格最小的商品价格
+							break;
+						} else {
+							tolPri = tolPri - activityArray[j].nums * activityArray[j].otpr;
+							replaceTemp = replaceTemp - activityArray[j].nums;
+						}
+					}
+					ultimatePrice = tolPri;
+				}
+			}
+			return ultimatePrice;
+		};
+
+		//特价
+		function specialOffer() {
+			var tjArray = [];
+			var tjner = 0;
+			$('.shopCardetails_row2').each(function () {
+				var tjVal = $(this).find('.tj').val();
+				if (tjVal == 1) {
+					var tjgdId = $(this).attr("data-proId");
+					var tjtpr = $(this).find('.itemPirce').attr("data-itemPirce");
+					var tjgdname = $(this).find('.goodsName').attr("data-relName");
+					var tjspinner = $(this).find('.shopSpinnerInput').val();
+					var tjproductObj = {
+						ogdId: tjgdId,
+						otpr: tjtpr,
+						ogdname: tjgdname,
+						nums: tjspinner
+					}
+					tjArray.push(tjproductObj);
+				}
+			});
+			for (var i = 0; i < tjArray.length; i++) {
+				if (tjArray.length == 0) {
+					tjner = 0;
+				} else {
+					tjner += Number(tjArray[i].otpr) * Number(tjArray[i].nums);
+				}
+			}
+			return tjner;
+		}
+
+
+		//不参加任何活动
+		function noActivity() {
+			var naArray = [];
+			var naner = 0;
+			var naultimatePrice = 0;
+			$('.shopCardetails_row2').each(function () {
+				var nagdId = $(this).attr("data-proId");
+				var natpr = $(this).find('.origionPrice').attr("data-origionPrice");
+				var nagdname = $(this).find('.goodsName').attr("data-relName");
+				var naspinner = $(this).find('.shopSpinnerInput').val();
+				var naproductObj = {
+					ogdId: nagdId,
+					otpr: natpr,
+					ogdname: nagdname,
+					nums: naspinner
+				}
+				naArray.push(naproductObj);
+			});
+			for (var i = 0; i < naArray.length; i++) {
+				if (naArray.length == 0) {
+					naner = 0;
+				} else {
+					naner += Number(naArray[i].otpr) * Number(naArray[i].nums);
+				}
+			}
+			return naner.toFixed(2);
+		}
+		//折扣
+		function discount() {
+			var zkArray = [];
+			var zkNer = 0;
+			var zkTemp = 0;
+			var zkUltimatePrice_zk = 0;
+			$('.shopCardetails_row2').each(function () {
+				var zkVal = $(this).find('.zk').val();
+				var mjVal = $(this).find('.mj').val();
+				if (zkVal == 1) {
+					var zkgdId = $(this).attr("data-proId");
+					var zktpr = $(this).find('.origionPrice').attr("data-origionprice");
+					var zkgdname = $(this).find('.goodsName').attr("data-relName");
+					var zkspinner = $(this).find('.shopSpinnerInput').val();
+					var zkproductObj = {
+						ogdId: zkgdId,
+						otpr: zktpr,
+						ogdname: zkgdname,
+						nums: zkspinner
+					}
+					zkArray.push(zkproductObj);
+				}
+			});
+			for (zk in resultData) {
+				if (resultData[zk].planType == 1) {
+					zkTemp = resultData[zk].ratio;
+				}
+			}
+			for (var i = 0; i < zkArray.length; i++) {
+				if (zkArray.length == 0) {
+					zkNer = 0;
+				} else {
+					zkNer += Number(zkArray[i].otpr) * Number(zkArray[i].nums); //总价
+					zkUltimatePrice_zk = zkNer * (zkTemp / 100);
+				}
+			}
+			return zkUltimatePrice_zk;
+		}
+		//满减
+		function fullReduction() {
+			var mjArray = [];
+			var mjNer = 0;
+			var mjTemp = 0;
+			var mj2_upToPrice = 0;
+			var mj2_offPrice = 0;
+			var mjUltimatePrice_mj = 0;
+			$('.shopCardetails_row2').each(function () {
+				var zkVal = $(this).find('.zk').val();
+				var mjVal = $(this).find('.mj').val();
+				if (mjVal == 1) {
+					var mjgdId = $(this).attr("data-proId");
+					var mjtpr = $(this).find('.origionPrice').attr("data-origionprice");
+					var mjgdname = $(this).find('.goodsName').attr("data-relName");
+					var mjspinner = $(this).find('.shopSpinnerInput').val();
+					var mjproductObj = {
+						ogdId: mjgdId,
+						otpr: mjtpr,
+						ogdname: mjgdname,
+						nums: mjspinner
+					}
+					mjArray.push(mjproductObj);
+				}
+			});
+			for (mj in resultData) {
+				if (resultData[mj].planType == 2) {
+					mjTemp = resultData[mj].ratio;
+					mj2_upToPrice = resultData[mj].upToPrice;
+					mj2_offPrice = resultData[mj].offPrice;
+				}
+			}
+			for (var i = 0; i < mjArray.length; i++) {
+				if (mjArray.length == 0) {
+					mjNer = 0;
+				} else {
+					mjNer += Number(mjArray[i].otpr) * Number(mjArray[i].nums); //总价
+					if (mjNer >= mj2_upToPrice) {
+						mjUltimatePrice_mj = mjNer - mj2_offPrice;
+					} else {
+						mjUltimatePrice_mj = mjNer;
+					}
+				}
+			}
+			return mjUltimatePrice_mj;
+		}
+
+		$('.FavorableBlock').click(function () {
+			var choiceActivity = $(this).find("input").attr("data-val");
+			if (choiceActivity == "false") {
+				mui.toast('请选择优惠券');
+			} else {}
+			$('.FavorableBlock').find("input").removeAttr("checked");
+			$(this).find("input").attr("checked", "checked");
+		})
+
+		//判断是否参加活动
+		function getPirce() {
+			var totalQuantity = 0;
+			$(".no").hide();
+			$('.shopCardetails_row2').each(function () {
+				//满赠
+				if ($(this).find(".mz").val() == 1) {
+					var mzOtherPrice = 0;
+					var num = $(this).find(".shopSpinnerInput").val();
+					totalQuantity += Number(num);
+					for (var j = 0; j < resultData.length; j++) {
+						if (resultData[j].planType == 4) {
+							var upToCount = resultData[j].upToCount + 1;
+						}
+					}
+					if (totalQuantity >= upToCount) {
+						var mz = buyGift();
+						console.log(mz);
+						$('.shopCardetails_row2').each(function () {
+							if ($(this).find(".mz").val() == 0) {
+								var mzItemPric = $(this).find(".origionPrice").attr("data-origionprice");
+								var mzNum = $(this).find(".shopSpinnerInput").val();
+								var mzTotalPrice = Number(mzItemPric) * Number(mzNum);
+								mzOtherPrice += mzTotalPrice;
+							}
+						})
+						var showPrice = mzOtherPrice + mz;
+						$('#another_mz').html(showPrice.toFixed(2));
+						$('#p_mz').show();
+					} else {}
+				} else {}
+
+				//特价
+				if ($(this).find(".tj").val() == 1) {
+					var tjOtherPrice = 0;
+					var tj = specialOffer();
+					$('.shopCardetails_row2').each(function () {
+						if ($(this).find(".tj").val() == 0) {
+							var tjItemPric = $(this).find(".origionPrice").attr("data-origionprice");
+							var tjNum = $(this).find(".shopSpinnerInput").val();
+							tjOtherPrice += Number(tjItemPric) * Number(tjNum);
+						}
+					})
+					var showPrice = tjOtherPrice + tj;
+					$('#another_tj').html(showPrice.toFixed(2));
+					$('#p_tj').show();
+				}
+
+				//满减
+				if ($(this).find(".mj").val() == 1) {
+					var mjUpToPrice = 0;
+					var mjOtherPrice = 0;
+					for (var i = 0; i < resultData.length; i++) {
+						if (resultData[i].planType == 2) {
+							mjUpToPrice = resultData[i].upToPrice;
+							break;
+						}
+					}
+
+					$('.shopCardetails_row2').each(function () {
+						if ($(this).find(".mj").val() == 0) {
+							var mjItemPric = $(this).find(".origionPrice").attr("data-origionprice");
+							var mjNum = $(this).find(".shopSpinnerInput").val();
+							var mjTotalPrice = Number(mjItemPric) * Number(mjNum);
+							mjOtherPrice += mjTotalPrice;
+						}
+					})
+
+					var mj = fullReduction();
+					if (mj >= mjUpToPrice) {
+						var showPric = mj + mjOtherPrice;
+						$('#another_mj').html(showPric.toFixed(2));
+						$('#p_mj').show();
+					} else {
+						$('#p_mj').hide();
+					}
+				} else {
+
+				}
+
+				//折扣
+				if ($(this).find(".zk").val() == 1) {
+					var zkOtherPrice = 0;
+					var zk = discount();
+					$('.shopCardetails_row2').each(function () {
+						if ($(this).find(".zk").val() == 0) {
+							var zkItemPric = $(this).find(".origionPrice").attr("data-origionprice");
+							var zkNum = $(this).find(".shopSpinnerInput").val();
+							var zkTotalPrice = Number(zkItemPric) * Number(zkNum);
+							zkOtherPrice += zkTotalPrice;
+						}
+					})
+					var showPrice = zk + zkOtherPrice
+					$('#another_zk').html(showPrice.toFixed(2));
+					$('#p_zk').show();
+				} else {
+
+				}
+
+				//不参加任何活动
+				if ($(this).find(".mz").val() == 0 && $(this).find(".tj").val() == 0 && $(this).find(".mj").val() == 0 && $(this)
+					.find(".zk").val() == 0) {
+					var showNoActivity = noActivity();
+					$('#another_refused').html(showNoActivity);
+					$('#p_noHd').show();
+				} else {
+
+				}
+			})
+		}
+		getPirce();
+
+		function getCoupons() {
+			var cou_id, cou_type;
+			var gift = 0;
+			var arr = [];
+			$('.panel_ul li').each(function () {
+				if ($(this).hasClass("actionTF")) {
+					cou_id = $(this).attr("data-id");
+					cou_type = $(this).attr("data-coutype");
+					var noActivitydjq = noActivity();
+					if (cou_type == 2) { //赠劵
+						$('#coups').attr("data-val", "6");
+						$('.origionPrice').each(function () {
+							var itemPirc = $(this).attr("data-origionprice");
+							arr.push(itemPirc);
+						})
+						var minVal = Math.min.apply(null, arr);
+						gift = noActivitydjq - minVal;
+
+					} else if (cou_type == 1) { //代金券
+						$('#coups').attr("data-val", "5");
+						if ($(this).hasClass("actionTF")) {
+							var discount = $(this).attr("data-discount");
+							gift = noActivitydjq - discount;
+						}
+					}
+					$("#another_yhj").html(gift.toFixed(2));
+					$('#yhjImg').attr("src", "../img/comment_5.png");
+					return false;
+				} else {
+
+				}
+			})
+			$('.marks').fadeOut();
+			$('.panel_ul li').animate({
+				top: "-100px"
+			})
+		}
+
+		//增减单品数量
+		$('.increase,.decrease').on('click', function () {
+			countIndex = $(this).parents('.shopCardetails_row2').index(); //商品下标
+			countNum = $(this).siblings('.shopSpinnerInput').val(); //数量
+			if ($(this).attr("class") == 'increase') { //加
+				countNum++;
+				localityDataList[countIndex].num = countNum;
+			} else if ($(this).attr("class") == 'decrease') { //减
+				countNum--;
+				if (countNum == 0) {
+					localityDataList.splice(countIndex, 1);
+					$('.shopCardetails_row2').eq(countIndex).remove();
+					if (localityDataList.length == 0) {
+						$('.show').show();
+						location.reload();
+					}
+				} else {
+					localityDataList[countIndex].num = countNum;
+				}
+			}
+			localStorage.setItem("dataList", JSON.stringify(localityDataList));
+			$(this).siblings('.shopSpinnerInput').val(countNum);
+			var a = JSON.parse(localStorage.getItem("dataList"));
+			getPirce();
+			getCoupons();
+			$('.panel_ul li').each(function () {
+				if ($(this).hasClass("actionTF")) {
+					jsCount = 1;
+					return false;
+				}
+			})
+			//					couponPrice(jsCount);
+		});
+
+		$('.coupons').click(function () {
+			$('.marks').fadeIn();
+			$('.panel_ul li').animate({
+				top: "30px"
+			})
+		})
+
+		$('#cancel').click(function () {
+			$('.marks').fadeOut();
+			$('#yhjImg').attr("src", "../img/comment_3.png");
+			$('.panel_ul li').animate({
+				top: "-100px"
+			})
+		})
+
+		function voucher() {
+			var htmlVoucher = '';
+			$.ajax({
+				type: "post",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": Authorization
+				},
+				url: base + "sale_inte/uesr/coupons.action",
+				data: {
+					"shopID": relatedobj.sh,
+					"enterpriseID": relatedobj.en,
+					"pinpaiID": relatedobj.pi
+				},
+				success: function (result) {
+					jishu = [];
+					console.log(result);
+					for (var i = 0; i < result.data.length; i++) {
+						if (result.data[i].status == 0) {
+							jishu.push(result.data[i]);
+							htmlVoucher += "<li data-id='" + result.data[i].couId + "'  data-rel='0' data-couType='" + result.data[i].couType +
+								"' data-discount='" + result.data[i].discount + "'>"
+							htmlVoucher += "<img class='selectCoupons' src='../img/comment_3.png' />"
+							htmlVoucher += "<p class='p1'>小玎小珰</p>"
+							htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+							if (result.data[i].couType == 2) {
+								htmlVoucher += "<span class='couponDescription'>此优惠券不适用于套餐</span>"
+							}
+							htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i]
+								.endDate.substring(10, -1) + "</span></p>"
+							htmlVoucher += "<span class='status' style='color:#369dfc;'>有效</span>"
+							htmlVoucher += "</li>"
+						} else if (result.data[i].status == 1) {
+							htmlVoucher += "<li data-id='" + result.data[i].couId + "'>"
+							htmlVoucher += "<div class='panlzz'>"
+							htmlVoucher += "<p class='p1'>小玎小珰</p>"
+							htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+							htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i]
+								.endDate.substring(10, -1) + "</span></p>"
+							htmlVoucher += "<span class='status' style='color:red;'>已使用</span>"
+							htmlVoucher += "</div>"
+							htmlVoucher += "</li>"
+						} else if (result.data[i].status == 3) {
+							htmlVoucher += "<li data-id='" + result.data[i].couId + "'>"
+							htmlVoucher += "<div class='panlzz'>"
+							htmlVoucher += "<p class='p1'>小玎小珰</p>"
+							htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+							htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i]
+								.endDate.substring(10, -1) + "</span></p>"
+							htmlVoucher += "<span class='status' style='color:red;'>已过期</span>"
+							htmlVoucher += "</div>"
+							htmlVoucher += "</li>"
+						}
+					}
+					$('.panel_ul').html(htmlVoucher);
+
+					if (jishu.length == 0) {
+						$('#coupsDiv').hide();
+					} else {
+						$('#coupsDiv').show();
+					}
+					
+					$('.panel_ul li').click(function () {
+						var arrgs = JSON.parse(localStorage.getItem("dataList"));
+						if (arrgs.length == 0) {
+							mui.toast('请选择商品后再选择优惠券');
+						} else {
+							var dataRel = $(this).attr("data-rel");
+							if (dataRel == 0) {
+								$('.selectCoupons').attr("src", "../img/comment_3.png");
+								$(this).find('.selectCoupons').attr("src", "../img/comment_5.png");
+								$(this).addClass("actionTF").siblings().removeClass("actionTF");
+							}
+						}
+					});
+					$('#available').html(jishu.length);
+				}
+			});
+		}
+		voucher();
+
+		function setTotil() {
+			$('.FavorableBlock input').each(function () {
+				if ($(this)[0].hasAttribute("checked")) {
+					var pp = $(this).parents(".FavorableBlock").find(".preferentialPirce").text();
+					$('#combined').html(pp);
+				} else {}
+			})
+		}
+		setTotil();
+
+		//清空购物车
+		$('.clear').click(function () {
+			var empty = JSON.parse(localStorage.getItem("dataList"));
+			if (empty.length == 0) {
+				mui.toast('购物车已经是空');
+			} else {
+				empty = [];
+				localStorage.setItem("dataList", JSON.stringify(empty));
+				var empty2 = JSON.parse(localStorage.getItem("dataList"));
+				$('.shopCardetails_row2').remove();
+				$('#combined').html('0.00');
+				location.reload();
+			}
+		});
+
+		//订单
+		function dd() {
+			$.ajax({
+				type: "post",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": Authorization
+				},
+				url: base + "sale_inte/order/submit.action",
+				data: {
+					"data": JSON.stringify(highestData)
+				},
+				ContentType: "application/json",
+				beforeSend: function () {
+					$('.marksYdn').show();
+				},
+				success: function (resultAsx) {
+					console.log(resultAsx);
+					if (resultAsx.data.totalPrice == '0.00') {
+						mui.toast('下单成功');
+						var emptyArr = [];
+						localStorage.setItem("dataList", JSON.stringify(emptyArr));
+						location.reload();
+					} else {
+						var orderId = resultAsx.data.orderNo;
+
+						function genQueryData() {
+							var result;
+							$.ajax({
+								type: "post",
+								url: base + "sale_inte/pay/wxPrePay.action",
+								headers: {
+									"Authorization": Authorization
+								},
+								data: {
+									"ordId": resultAsx.data.orderId
+								},
+								dataType: "json",
+								async: false,
+								success: function (jsonData) {
+									if (jsonData != undefined && jsonData != null && jsonData != "") {
+										result = jsonData.data;
+									}
+								}
+							});
+							return result;
+						}
+
+						function onBridgeReady() {
+							WeixinJSBridge.invoke('getBrandWCPayRequest', genQueryData(), function (res) {
+								if (res.err_msg == "get_brand_wcpay_request:ok") {
+									var emptyArr = [];
+									localStorage.setItem("dataList", JSON.stringify(emptyArr));
+									location.reload();
+								}
+							});
+						}
+
+						function init() {
+							if (typeof WeixinJSBridge == "undefined") {
+								if (document.addEventListener) {
+									document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+								} else if (document.attachEvent) {
+									document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+									document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+								}
+							} else {
+								onBridgeReady();
+							}
+						}
+						init();
+					}
+
+				},
+				complete: function () {
+					ican = uuid();
+					$('.marksYdn').hide();
+				}
+			});
+		}
+
+		function orderDataDtructure(_ice, _discountsActivity) {
+			var dataxAx = {};
+			var data = [];
+			var getStructure = JSON.parse(localStorage.getItem("dataList"));
+			for (var i = 0; i < getStructure.length; i++) {
+				var makes = [];
+				var mats = [];
+				var tastes = [];
+				var makesObject = {};
+				var tastesObject = {};
+				if (getStructure[i].proType == 1) {
+					for (var j = 0; j < getStructure[i].makes.length; j++) {
+						if (getStructure[i].makes[j].practiceId == '') {
+							makes = [];
+						} else {
+							makesObject = {
+								practiceId: getStructure[i].makes[j].practiceId,
+								makesName: getStructure[i].makes[j].makesName
+							}
+							makes.push(makesObject);
+						}
+					}
+
+					if (getStructure[i].mats[0].proMatId == '') {
+						mats = [];
+					} else {
+						mats = [{
+							proMatId: getStructure[i].mats[0].proMatId,
+							matsName: getStructure[i].mats[0].matsName,
+							matShopPirce: getStructure[i].mats[0].matShopPirce
+						}];
+					}
+
+					for (var t = 0; t < getStructure[i].tastes.length; t++) {
+						if (getStructure[i].tastes[t].tasteId == '') {
+							tastes = [];
+						} else {
+							tastesObject = {
+								tasteId: getStructure[i].tastes[t].tasteId,
+								tastesName: getStructure[i].tastes[t].tastesName
+							}
+							tastes.push(tastesObject);
+						}
+					}
+					dataxAx = {
+						proId: getStructure[i].proId,
+						num: getStructure[i].num,
+						proType: 1,
+						makes,
+						mats,
+						tastes
+					};
+					data.push(dataxAx);
+
+				} else if (getStructure[i].proType == 2) {
+					var taocan = [];
+					var taocanObject = {};
+					for (var q = 0; q < getStructure[i].dataTaoCanArray.length; q++) {
+						for (var w = 0; w < getStructure[i].dataTaoCanArray[q].makes.length; w++) {
+							if (getStructure[i].dataTaoCanArray[q].makes[w].practiceId == '') {
+								makes = [];
+							} else {
+								makesObject = {
+									practiceId: getStructure[i].dataTaoCanArray[q].makes[w].practiceId,
+									makesName: getStructure[i].dataTaoCanArray[q].makes[w].makesName
+								}
+								makes.push(makesObject);
+							}
+						}
+						if (getStructure[i].dataTaoCanArray[q].mats[0].proMatId == '') {
+							mats = [];
+						} else {
+							mats = [{
+								proMatId: getStructure[i].dataTaoCanArray[q].mats[0].proMatId,
+								matsName: getStructure[i].dataTaoCanArray[q].mats[0].matsName,
+								matShopPirce: getStructure[i].dataTaoCanArray[q].mats[0].matShopPirce
+							}];
+						}
+
+						for (var e = 0; e < getStructure[i].dataTaoCanArray[q].tastes.length; e++) {
+							if (getStructure[i].dataTaoCanArray[q].tastes[e].tasteId == '') {
+								tastes = [];
+							} else {
+								tastesObject = {
+									tasteId: getStructure[i].dataTaoCanArray[q].tastes[e].tasteId,
+									tastesName: getStructure[i].dataTaoCanArray[q].tastes[e].tastesName
+								}
+								tastes.push(tastesObject);
+							}
+						}
+						dataxAx = {
+							proId: getStructure[i].dataTaoCanArray[q].proId,
+							combID: getStructure[i].dataTaoCanArray[q].id,
+							makes,
+							mats,
+							tastes
+						};
+						taocan.push(dataxAx);
+					}
+					taocanObject = {
+						proId: getStructure[i].proId,
+						proType: 2,
+						num: 1,
+						taocan
+					}
+					data.push(taocanObject);
+				}
+			}
+
+			highestData = {
+				orderID: ican,
+				createTime: colData,
+				shopID: relatedobj.sh,
+				ordSource: 1,
+				enterpriseID: relatedobj.en,
+				pinpaiID: relatedobj.pi,
+				quanIds: _ice,
+				orderType: 1,
+				startTime: "",
+				endTime: "",
+				discountsType: 2,
+				discountsActivity: _discountsActivity,
+				data
+			}
+			console.log(highestData);
+			dd();
+		}
+
+		//模式2结账
+		$('.settlement2').click(function () {
+			var isMoble = localStorage.getItem("isMobile");
+			var arrText = [];
+			var isChecked = "flase";
+			//				var ert = 0;
+			var getLocaShopCat = JSON.parse(localStorage.getItem("dataList"));
+			if ($('#coups')[0].hasAttribute("checked") && $('#coups').attr("data-val") == "false") {
+				var yhj = 1;
+			} else {
+				var yhj = 0;
+			}
+
+			$('.FavorableBlock input').each(function () {
+				if ($(this)[0].hasAttribute("checked")) {
+					isChecked = "true";
+					return false;
+				} else {
+					isChecked = "flase";
+				}
+			})
+
+			if (getLocaShopCat.length == 0 || getLocaShopCat == null) {
+				mui.toast('请选择商品后结算');
+			} else if (isMoble == 0 || isMoble == null) {
+				mui.toast('请先完善个人信息');
+				location.href = 'personal_information.html';
+			} else if (yhj == 1) {
+				mui.toast('请选择优惠券');
+			} else if (isChecked == "flase") {
+				mui.toast('请选择活动类型');
+			} else {
+				var ice = [];
+				$('.FavorableBlock input').each(function () {
+					if ($(this)[0].hasAttribute("checked") && $(this).attr("id") == "coups") {
+						$('.panel_ul li').each(function () {
+							if ($(this).hasClass("actionTF")) {
+								var dataIdYhj = $(this).attr("data-id");
+								ice.push(dataIdYhj);
+							}
+						})
+						return false;
+					} else {
+						ice = [];
+					}
+				})
+				$('.FavorableBlock input').each(function () {
+					if ($(this)[0].hasAttribute("checked")) {
+						var tpus = $(this).attr("data-val");
+						console.log(tpus);
+						orderDataDtructure(ice, tpus);
+						return false;
+					} else {}
+				})
+			}
+		})
+	</script>
+</body>
+
+</html>

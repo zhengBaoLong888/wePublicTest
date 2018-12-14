@@ -1,0 +1,20 @@
+@media screen and (max-width: 1024px) {
+    .headSwitchStores_left img {
+        margin-top: -8px;
+    }
+}
+@media screen and (max-width: 768px) {
+    .headSwitchStores_left img {
+        margin-top: -3px;
+    }
+}
+@media screen and (max-width: 414px) {
+    .headSwitchStores_left img {
+        margin-top: 3px;
+    }
+}
+@media screen and (max-width: 375px) {
+    .headSwitchStores_left img {
+        margin-top: 4px;
+    }
+}

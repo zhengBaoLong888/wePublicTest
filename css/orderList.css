@@ -1,0 +1,53 @@
+body {
+	line-height: normal;
+}
+
+.order-main {
+	background-color: #fff;
+}
+
+.store-title {
+	width: 87.5%;
+	margin: 0 auto;
+	text-align: center;
+}
+
+.store_7 {
+	width: 100%;
+}
+
+.store-titleName {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.store-titleNameFont {
+	font-size: 42px;
+	font-weight: bold;
+	color: #000;
+}
+.store-title article {
+	margin-top: 20px;
+}
+.store-title {
+	background-color: #fff;
+}
+.purchase_quantity{
+	top:33%;
+}
+.typeAction{
+	color: #e5831d;
+}
+.tabSelect{
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+	border-bottom: #eeeeee solid 1px;
+}
+.tabSelect li{
+	width: 25%;
+	text-align: center;
+	padding: 15px 0;
+	font-size: 20px;
+}

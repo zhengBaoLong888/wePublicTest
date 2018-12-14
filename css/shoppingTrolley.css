@@ -1,0 +1,372 @@
+.store-name {
+	width: 100%;
+	padding: 0 5%;
+	height: 80px;
+	line-height: 80px;
+	font-size: 26px;
+	color: #333333;
+	border-bottom: #ededed solid 1px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.content-overall {
+	height: 100%;
+}
+
+.clear {
+	background-image: url(../img/bookmark_toolbar_delete.png);
+	background-position: right;
+	background-repeat: no-repeat;
+	background-size: 35px 35px;
+	padding-right: 40px;
+}
+
+.taste-btn {
+	width: 128px;
+	height: 47px;
+	line-height: 47px;
+	text-align: center;
+	border: #2396ff solid 1px;
+	border-radius: 20px;
+	color: #2396ff;
+	position: absolute;
+	top: 65px;
+	left: 140px;
+	z-index: 15;
+}
+
+input:disabled {
+	color: #666666;
+	-webkit-text-fill-color: #666666;
+	-webkit-opacity: 1;
+	opacity: 1;
+}
+
+.shopping-information {
+	width: 60%;
+	position: relative;
+}
+
+.shopping-delect {
+	color: #f90d0d;
+	font-size: 26px;
+}
+
+.shopping-price {
+	font-size: 25px;
+	color: #f90d0d;
+	margin-top: 40px;
+}
+
+.js-btn {
+	width: 100%;
+	border-bottom: #ededed solid 1px;
+	padding: 8px 3%;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.js-btn span {
+	font-size: 26px;
+	line-height: 60px;
+}
+
+.settlement {
+	color: #fff;
+	display: block;
+	width: 118px;
+	height: 60px;
+	background-color: #e8af14;
+	border-radius: 10px;
+	text-align: center;
+}
+
+.takeLookOther .shopping-title {
+	font-size: 25px;
+	color: #333333;
+	font-weight: bold;
+	padding: 25px 5%;
+}
+
+.takeLookOther ul li {
+	width: calc(50% - 2.5px);
+	position: relative;
+	background-color: #f2f2f2;
+	padding-bottom: 20px;
+}
+
+.shopping-increase {
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+}
+
+.takeLookOther ul li p {
+	margin-left: 5%;
+	margin-top: 15px;
+}
+
+.takeLookOther ul {
+	display: flex;
+	justify-content: space-between;
+}
+
+.pirNumber {
+	color: #a7a7a7;
+	font-size: 21px;
+	position: absolute;
+	right: 40px;
+}
+
+.show {
+	width: 100%;
+	height: 300px;
+	line-height: 300px;
+	font-size: 30px;
+	text-align: center;
+	color: #333333;
+	display: none;
+	border-bottom: #ededed solid 1px;
+}
+
+.kul {
+	padding: 50px 0;
+	text-align: center;
+	font-size: 26px;
+}
+
+.default {
+	display: none;
+}
+
+.coupons {
+	padding: 8px 3%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 22px;
+	border-bottom: #ededed solid 1px;
+}
+
+.coupons img {
+	width: 6%;
+}
+
+.marks {
+	background-color: #fff;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 20;
+	display: none;
+}
+
+.row3 {
+	position: fixed;
+	bottom: 0;
+}
+
+.panel {
+	padding: 20px 4%;
+	height: calc(100% - 80px);
+	overflow-y: auto;
+}
+
+.panel_ul li {
+	width: 599px;
+	height: 244px;
+	padding-right: 10px;
+	background-image: url(../img/zeng.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 599px 244px;
+	position: relative;
+}
+
+.panel_ul li p {
+	display: block;
+	width: 410px;
+	position: absolute;
+	right: 4%;
+	z-index: 21;
+	color: #474747;
+	text-align: center;
+}
+
+.panel_ul li .p1 {
+	top: 15px;
+	right: 15px;
+	font-size: 22px;
+	text-align: left;
+}
+
+.panel_ul li .p2 {
+	top: 80px;
+	font-size: 30px;
+}
+
+.panel_ul li .p3 {
+	top: 190px;
+	font-size: 17px;
+	color: #989898;
+	border-top: #e2e2e2 solid 2px;
+	padding-top: 10px;
+	text-align: left;
+}
+
+.selectCoupons {
+	width: 6%;
+	position: absolute;
+	top: 10px;
+	right: 5%;
+	z-index: 22;
+}
+
+.actionTF {}
+
+.status {
+	position: absolute;
+	bottom: 70px;
+	right: 4%;
+}
+
+.panlzz {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(255, 255, 255, 0.7);
+}
+
+.numAva {
+	color: #fff;
+	padding: 3px 10px;
+	font-size: 18px;
+	margin-left: 52%;
+	background: -webkit-linear-gradient(left, #74F195, #C8FF9A);
+	background: -o-linear-gradient(right, #74F195, #C8FF9A);
+	background: -moz-linear-gradient(right, #74F195, #C8FF9A);
+	background: linear-gradient(to right, #ff7111, #e33b17);
+	border: #ff6e52 solid 1px;
+}
+
+.marksYdn {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 99;
+	text-align: center;
+	background-color: rgba(255, 255, 255, 0);
+	display: none;
+}
+
+.marksYdn span {
+	padding: 10px 30px 10px 60px;
+	position: absolute;
+	top: 47%;
+	left: 36%;
+	background-color: rgba(0, 0, 0, 0.6);
+	border-radius: 10px;
+	display: block;
+	color: #f5f5f5;
+	font-size: 28px;
+	background-image: url(../img/loading4.gif);
+	background-position: 9% 50%;
+	background-repeat: no-repeat;
+	background-size: 30px 30px;
+	line-height: initial;
+}
+
+.layout-felx {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.shopCat-img {
+	width: 40px;
+	height: 23px;
+	margin-left: 5px;
+}
+
+.couponDescription {
+	position: absolute;
+	bottom: 65px;
+	left: 170px;
+}
+
+.selectPreferentialActivities {
+	padding: 8px 3%;
+	border-bottom: #ededed solid 1px;
+}
+
+.selectPreferentialActivities input {
+	width: 25px;
+	height: 25px;
+	-webkit-appearance: radio;
+	margin-right: 10px;
+}
+
+.selectPreferentialActivities label {
+	font-size: 24px;
+}
+
+.FavorableBlock {
+	margin-bottom: 10px;
+}
+
+.preferentialPirce {
+	color: #f90d0d;
+}
+
+#spaTitle {
+	padding: 5px 0 10px 0;
+	font-size: 22px;
+}
+
+.flex {
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.no{
+	display: none;
+}
+.js-btn,.js-btn2{
+	display: none;
+}
+.js-btn2 span{
+	width:70%;
+	border-radius:20px;
+	font-size:26px;
+	padding: 8px 3%;
+	text-align: center;
+	margin: 20px auto;
+	height: auto;
+	color: #fff;
+	line-height: normal;
+	float: none;
+	display: block;
+	background-color: #e8af14;
+}
+.orgPri{
+	margin-top: 5px;
+	text-decoration: line-through;
+}
+.orgPri span{
+	font-size: 16px;
+}
+.setFlex{
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+}

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+	<title>活动介绍</title>
+	<link rel="stylesheet" href="../css/commen.css" />
+	<link rel="stylesheet" href="../css/discover_sub_2.css" />
+</head>
+
+<body class="entirety-style" style="background-color: #f6e382;font-family:'PingFang SC Bold';">
+	<div class="content">
+		<div class="header">
+			<div class="head_row1">开业嗨皮会场</div>
+			<div class="head_banner">
+				<img src="../img/coups_banner.jpg" />
+			</div>
+		</div>
+		<div class="main">
+			<div class="main_announcementRow1">
+				<div class="main_announcementCol1">
+					<span class="main_announcementCol1Row1">抢购<br />时间</span>
+					<div class="main_announcementCol1Row2">
+						<p>每天12点~19点整点限量开枪</p>
+						<p style="font-size: 18px;">开抢倒计时：00：05：00.00</p>
+					</div>
+				</div>
+				<div class="main_announcementCol2">我要<br />分享</div>
+			</div>
+			<div class="main_announcementRow2">
+				<p style="font-size: 24px;color: #000;font-weight: bold;margin-bottom: 5px;">活动规则：</p>
+				<p>每天整点(12点、13点、14点、15点、16点、17点、18点、19点)准时发放代金券，代金券每次发放时间为5分钟，5分钟之可随心所欲抢,活动期间用户可通过直接点击的方式抢取代金券,代金券数量有限，先到先得，领完为止。</p>
+			</div>
+
+			<ul class="coupsList">
+
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+	<script>
+		var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+		var token = localStorage.getItem("token");
+		var Authorization = "Bearer " + token;
+		var base = localStorage.getItem("base");
+		var html = "";
+
+		function rule() {
+			$.ajax({
+				type: "post",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": Authorization
+				},
+				data: {
+					"adverAppId": 6
+				},
+				url: base + "sale_inte/coupons/rule.action",
+				async: false,
+				success: function (result) {
+					console.log(result);
+					for (var i = 0; i < result.data.length; i++) {
+						if (result.data[i].length != 0) {
+							$('.coupsList').html("<li style='color:#000;font-size:30px;margin:30% auto 0;'>" + 暂无优惠券 + "</li>")
+						} else {
+
+						}
+						// 		// html +=<li>
+						// 		// 		html +=<p class="coupsName">￥<span>10元</span></p>
+						// 		// 		html +=<aside>
+						// 		// 				html +=	<p>1、不限饮品;</p>
+						// 		// 				html +=	<p>2、一个订单可使用一张; </p>
+						// 		// 				html +=	<p>3、代金券不可兑换现金,不找零;</p>
+						// 		// 				html +=<p>4、使用代金券时不得参加其他促销活动的优惠; </p>
+						// 		// 				html +=<p>5、有效期为三天.</p>
+						// 		// 				html +=</aside>
+						// 		// 				html +=</li>
+					}
+				}
+			})
+		}
+		rule();
+	</script>
+</body>
+
+</html>

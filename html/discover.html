@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>发现</title>
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/discover.css" />
+	</head>
+
+	<body>
+		<div class="discover-banner">
+			<img src="../img/discover_banner.jpg" />
+			<img class="discover-logo" src="../img/discover_5.png" />
+		</div>
+		<div class="discover-main">
+			<div class="discover-main-banner-list">
+				<article id="discover_div" style="padding-top: 125px;">
+				</article>
+				<div class="hint">
+					<img src="../img/discover_6.png" />
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script>
+			var base = localStorage.getItem("base");
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+			function discover() {
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					url: base + "sale_inte/consumers/banner.action",
+					data: {
+						"pinpaiID": relatedobj.pi,
+						"fileType": 2
+					},
+					success: function(result) {
+						var html = '';
+						console.log(result);
+						for(var i=0;i<result.data.length;i++){
+							html += "<a class='repaks' data-rel='"+result.data[i].advertisementAppId+"'><img src='"+result.data[i].path+"' /></a>"
+						}
+						$('#discover_div').html(html);
+						
+						$('.repaks').click(function(){
+							var repaksVal = $(this).attr("data-rel");
+							localStorage.setItem("repaksVal",repaksVal);
+							location.href = 'discover_details.html';
+						})
+					}
+				});
+			}
+			discover();
+		</script>
+	</body>
+
+</html>

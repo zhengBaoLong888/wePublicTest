@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+		<title>购物车</title>
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/shoppingTrolley.css" />
+	</head>
+
+	<body class="entirety-bg">
+		<div class="marksYdn"><span>请稍后...</span></div>
+		<div class="mui-content">
+			<div class="content-overall commen-style">
+				<aside class="commenBack-head">
+					<a id="shopBack" onclick="history.back();">购物车</a>
+				</aside>
+				<div class="store-name">
+					<span class="dianPuName"></span>
+					<span class="clear">清空</span>
+				</div>
+				<div id="dd-page">
+					<div class="shopCatList">
+
+					</div>
+					<div class="show">购物车还是空的哦~</div>
+					<div class="coupons">
+						<span>使用优惠券</span>
+						<div class="numAva"><span id="available">0</span>张可用</div>
+						<img id="yhjImg" src="../img/comment_3.png" />
+					</div>
+					<article class="js-btn">
+						<span>合计:</span>
+						<span id="combined" style="color:#f90d0d;padding: 0 40px 0 15px;">0</span>
+						<span class="settlement">去结算</span>
+					</article>
+				</div>
+
+
+				<article class="marks">
+					<div class="panel">
+						<ul class="panel_ul">
+
+						</ul>
+					</div>
+					<div class="row3">
+						<span id="cancel">取消</span>
+						<span id="confirm">确定</span>
+					</div>
+				</article>
+			</div>
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript " src="../js/mui.min.js "></script>
+		<script type="text/javascript" src="../js/script.js"></script>
+		<script>
+			mui.init();
+			var localityDataList = JSON.parse(localStorage.getItem('dataList')); //购物车基础数组
+			var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+			var products = JSON.parse(localStorage.getItem("products"));
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var base = localStorage.getItem("base");
+			var html = '';
+			var locaTotlePrice = 0;
+			var ultimatePrice = 0; //买赠
+			var tjultimatePrice = 0;
+			var naultimatePrice = 0; //不参加任何活动
+			var fdrUltimatePrice_zk = 0 //满减折扣
+			var fdrUltimatePrice_mj = 0 //满减折扣
+			var totlePric_zkMj = 0;
+			var zkUltimatePrice_zk = 0; //折扣
+			var mjUltimatePrice_mj = 0; //满减
+			var resultData;
+			var highestData = {};
+			var ultimatePrice = 0
+			var jishu = [];
+			var jsCount = 0;
+
+			//获取当前时间
+			var colData = getDate();
+
+			function uuid() {
+				var s = [];
+				var hexDigits = "0123456789abcdef";
+				for(var i = 0; i < 30; i++) {
+					s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+				}
+				s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+				s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+				s[8] = s[13] = s[18] = s[23];
+				var uuid = s.join("");
+				return uuid;
+			}
+			var ican = uuid();
+
+			$('.dianPuName').html(relatedobj.sn);
+			console.log(localityDataList);
+
+			//购物车列表 start
+			if(localityDataList.length == 0) {
+				$('.show').show();
+			} else {
+				$('.show').hide();
+				for(var i = 0; i < localityDataList.length; i++) {
+					var dataProId = localityDataList[i].proId;
+					if(localityDataList[i].proType == 1) {
+						var itemPirce, totalPirce;
+						html += "<div class='shopCardetails_row2' data-proId = '" + localityDataList[i].proId + "' data-playType = '" + localityDataList[i].proType + "'>"
+						html += "<div class='shopCarCol-1'>"
+						html += "<div class='layout-felx'>"
+
+						html += "<span class='goodsName' data-relName='" + localityDataList[i].goodsProName + "'>" + localityDataList[i].goodsProName + "</span>"
+						if(localityDataList[i].isDz == 1) {
+							html += "<img class='shopCat-img' src='../img/zhekou.png'/>"
+						}
+						if(localityDataList[i].isMz == 1) {
+							html += "<img class='shopCat-img' src='../img/manzeng.png'/>"
+						}
+						if(localityDataList[i].isMj == 1) {
+							html += "<img class='shopCat-img' src='../img/manjian.png'/>"
+						}
+						if(localityDataList[i].isTj == 1) {
+							html += "<img class='shopCat-img' src='../img/tejia.png'/>"
+						}
+						html += "</div>"
+						html += "<p class='goodsTasker'></p>"
+						for(a in localityDataList[i].makes) {
+							html += "<span class='tasteGroup'>" + localityDataList[i].makes[a].makesName + "</span>"
+							html += "    "
+						}
+						for(b in localityDataList[i].mats) {
+							html += "<span class='tasteGroup'>" + localityDataList[i].mats[b].matsName + "</span>"
+							html += "    "
+						}
+						for(c in localityDataList[i].tastes) {
+							html += "<span class='tasteGroup'>" + localityDataList[i].tastes[c].tastesName + "</span>"
+							html += "    "
+						}
+						html += "</div>"
+						if(localityDataList[i].mats[0].matShopPirce == '') {
+							html += "<input class='shop_addUp' type='hidden' value='0' />" //加价
+						} else {
+							html += "<input class='shop_addUp' type='hidden' value='" + localityDataList[i].mats[0].matShopPirce + "' />" //加价
+						}
+
+						for(hdItem in products) {
+							if(products[hdItem].proType == 1 && products[hdItem].proId == dataProId) {
+								html += "<input class='mz' type='hidden' value='" + products[hdItem].isPresented + "' />" //满赠
+								html += "<input class='tj' type='hidden' value='" + products[hdItem].isBargain + "' />" //特价
+								html += "<input class='zk' type='hidden' value='" + products[hdItem].isDiscount + "' />" //折扣
+								html += "<input class='mj' type='hidden' value='" + products[hdItem].isMoneyOff + "' />" //满减
+							}
+						}
+						for(item in products) {
+							if(products[item].proId == dataProId) {
+								itemPirce = Number(localityDataList[i].mats[0].matShopPirce) + Number(products[item].price); //单价
+								totalPirce = localityDataList[i].num * itemPirce; //总价
+							}
+						}
+						html += "<div class='pirceA'>￥<span class='shopPirce' data-tolPirce='" + totalPirce.toFixed(2) + "'data-itemPirce='" + itemPirce.toFixed(2) + "'>" + itemPirce.toFixed(2) + "</span></div>"
+						html += "<div class='ShopSpinner'>"
+						html += "<button class='decrease'>-</button>"
+						html += "<input type='text' class='shopSpinnerInput' value='" + localityDataList[i].num + "' disabled='disabled'/>"
+						html += "<button class='increase'>+</button>"
+						html += "</div>"
+						html += "</div>"
+						html += "</div>"
+					} else if(localityDataList[i].proType == 2) {
+						html += "<div class='shopCardetails_row2' data-proId = '" + localityDataList[i].proId + "' data-playType = '" + localityDataList[i].proType + "'>"
+						html += "<div class='shopCarCol-1'>"
+						html += "<span class='goodsName' data-relName='" + localityDataList[i].goodsProName + "'>" + localityDataList[i].goodsProName + "</span>"
+						html += "<p class='goodsTasker'></p>"
+						for(a in localityDataList[i].dataTaoCanArray) {
+							html += "<span class='tasteGroup'>" + localityDataList[i].dataTaoCanArray[a].sexname + "</span>"
+							html += "    "
+						}
+						html += "</div>"
+						html += "<input class='shop_addUp' type='hidden' value='0' />" //加价
+						for(hdItem in products) {
+							if(products[hdItem].proType == 2 && products[hdItem].proId == dataProId) {
+//								html += "<input class='mz' type='hidden' value='" + products[hdItem].isPresented + "' />" //满赠
+//								html += "<input class='tj' type='hidden' value='" + products[hdItem].isBargain + "' />" //特价
+//								html += "<input class='zk' type='hidden' value='" + products[hdItem].isDiscount + "' />" //折扣
+//								html += "<input class='mj' type='hidden' value='" + products[hdItem].isMoneyOff + "' />" //满减
+																html += "<input class='mz' type='hidden' value='0' />" //满赠
+																html += "<input class='tj' type='hidden' value='0' />" //特价
+																html += "<input class='zk' type='hidden' value='0' />" //折扣
+																html += "<input class='mj' type='hidden' value='0' />" //满减
+							}
+						}
+
+						html += "<div class='pirceA'>￥<span class='shopPirce' data-tolPirce='" + localityDataList[i].price + "'data-itemPirce='" + localityDataList[i].price + "'>" + localityDataList[i].price + "</span></div>"
+						html += "<div class='ShopSpinner'>"
+						html += "<button class='decrease'>-</button>"
+						html += "<input type='text' class='shopSpinnerInput' value='" + localityDataList[i].num + "' />"
+						html += "<button class='increase'>+</button>"
+						html += "</div>"
+						html += "</div>"
+						html += "</div>"
+
+					}
+					$('.shopCatList').html(html);
+				}
+			} //购物车列表 end
+
+			//计算单价
+			function unitPrice() {
+				locaTotlePrice = 0;
+				var unitPrice = JSON.parse(localStorage.getItem('dataList'));
+				$('.shopCardetails_row2').each(function(index) {
+					var index = index;
+					var unitItemPirce = $(this).find('.shopPirce').attr("data-itemPirce");
+					var unitNum = unitPrice[index].num;
+					locaTotlePrice = Number(unitItemPirce) * Number(unitNum);
+					$(this).find('.shopPirce').attr("data-tolPirce", locaTotlePrice.toFixed(2));
+					$(this).find('.shopPirce').html(locaTotlePrice.toFixed(2));
+				})
+			}
+			unitPrice();
+			//买赠
+			function buyGift() {
+				var uc = 0;
+				var fe = 0;
+				var ner = 0;
+				var tolPri = 0;
+				var minusPrice = 0;
+				var temp = 9999;
+				ultimatePrice = 0;
+				var activityArray = [];
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					data: {
+						"shopID": relatedobj.sh,
+						"enterpriseID": relatedobj.en,
+						"pinpaiID": relatedobj.pi
+					},
+					url: base + "sale_inte/salespromotion/getpromotion.action",
+					async: false,
+					success: function(result) {
+						resultData = result.data;
+						$('.shopCardetails_row2').each(function() {
+							var mzVal = $(this).find('.mz').val();
+							if(mzVal == 1) {
+								var gdId = $(this).attr("data-proId");
+								var tpr = $(this).find('.shopPirce').attr("data-itemPirce");
+								var gdname = $(this).find('.goodsName').attr("data-relName");
+								var spinner = $(this).find('.shopSpinnerInput').val();
+								var productObj = {
+									ogdId: gdId,
+									otpr: tpr,
+									ogdname: gdname,
+									nums: spinner
+								}
+								activityArray.push(productObj);
+							}
+						});
+						if(result.data.length == 0) {
+							for(var i = 0; i < activityArray.length; i++) {
+								ultimatePrice += activityArray[i].nums * activityArray[i].otpr;
+							}
+						} else {
+							for(var i = 0; i < activityArray.length; i++) {
+								ner += Number(activityArray[i].nums); //总数量
+								tolPri += Number(activityArray[i].otpr) * Number(activityArray[i].nums); //总价
+							};
+							for(l in result.data) {
+								if(result.data[l].planType == 4) {
+									var x = result.data[l].upToCount;
+									var y = result.data[l].freeCount;
+									var v = ner - x - y;
+									if(v < 0) {
+										v = 0;
+									} else {}
+									var z = x + v;
+
+									if(z < temp) {
+										temp = z;
+										uc = result.data[l].upToCount;
+										fe = result.data[l].freeCount;
+									}
+								}
+							};
+							var compare = function(obj1, obj2) {
+								var val1 = obj1.otpr;
+								var val2 = obj2.otpr;
+								if(val1 < val2) {
+									return -1;
+								} else if(val1 > val2) {
+									return 1;
+								} else {
+									return 0;
+								}
+							}
+							activityArray.sort(compare);
+							var replaceTemp = ner - temp; //赠送杯数 
+							var totNum = uc + fe;
+							if(ner < totNum) {
+								ultimatePrice = tolPri;
+							} else {
+								for(var j = 0; j < activityArray.length; j++) {
+									if(activityArray[j].nums >= replaceTemp) {
+										tolPri = tolPri - Number(activityArray[j].otpr) * replaceTemp;
+										break;
+									} else {
+										tolPri = tolPri - activityArray[j].nums * activityArray[j].otpr;
+										replaceTemp = replaceTemp - activityArray[j].nums;
+									}
+								}
+								ultimatePrice = tolPri;
+							}
+						}
+					}
+				})
+			};
+			buyGift();
+
+			//特价
+			function specialOffer() {
+				var tjArray = [];
+				var tjner = 0;
+				$('.shopCardetails_row2').each(function() {
+					var tjVal = $(this).find('.tj').val();
+					if(tjVal == 1) {
+						var tjgdId = $(this).attr("data-proId");
+						var tjtpr = $(this).find('.shopPirce').attr("data-itemPirce");
+						var tjgdname = $(this).find('.goodsName').attr("data-relName");
+						var tjspinner = $(this).find('.shopSpinnerInput').val();
+						var tjproductObj = {
+							ogdId: tjgdId,
+							otpr: tjtpr,
+							ogdname: tjgdname,
+							nums: tjspinner
+						}
+						tjArray.push(tjproductObj);
+					}
+				});
+				for(var i = 0; i < tjArray.length; i++) {
+					if(tjArray.length == 0) {
+						tjner = 0;
+					} else {
+						tjner += Number(tjArray[i].otpr) * Number(tjArray[i].nums);
+					}
+
+				}
+				tjultimatePrice = tjner;
+			}
+			specialOffer();
+
+			//不参加任何活动
+			function noActivity() {
+				var naArray = [];
+				var naner = 0;
+				$('.shopCardetails_row2').each(function() {
+					var tjVal = $(this).find('.tj').val();
+					var mzVal = $(this).find('.mz').val();
+					var zkVal = $(this).find('.zk').val();
+					var mjVal = $(this).find('.mj').val();
+					if(tjVal != 1 && mzVal != 1 && zkVal != 1 && mjVal != 1) {
+						var nagdId = $(this).attr("data-proId");
+						var natpr = $(this).find('.shopPirce').attr("data-itemPirce");
+						var nagdname = $(this).find('.goodsName').attr("data-relName");
+						var naspinner = $(this).find('.shopSpinnerInput').val();
+						var naproductObj = {
+							ogdId: nagdId,
+							otpr: natpr,
+							ogdname: nagdname,
+							nums: naspinner
+						}
+						naArray.push(naproductObj);
+						console.log(naArray);
+					}
+				});
+				for(var i = 0; i < naArray.length; i++) {
+					if(naArray.length == 0) {
+						naner = 0;
+					} else {
+						naner += Number(naArray[i].otpr) * Number(naArray[i].nums);
+					}
+
+				}
+				naultimatePrice = naner;
+			}
+			noActivity();
+
+			//满减and折扣
+			function fullDiscountReduction() {
+				var fdrArray = [];
+				var fdrNer = 0;
+				var fdrTemp = 0;
+				var mj_upToPrice = 0;
+				var mj_offPrice = 0;
+				$('.shopCardetails_row2').each(function() {
+					var zkVal = $(this).find('.zk').val();
+					var mjVal = $(this).find('.mj').val();
+					if(zkVal == 1 && mjVal == 1) {
+						var fdrgdId = $(this).attr("data-proId");
+						var fdrtpr = $(this).find('.shopPirce').attr("data-itemPirce");
+						var fdrgdname = $(this).find('.goodsName').attr("data-relName");
+						var fdrspinner = $(this).find('.shopSpinnerInput').val();
+						var fdrproductObj = {
+							ogdId: fdrgdId,
+							otpr: fdrtpr,
+							ogdname: fdrgdname,
+							nums: fdrspinner
+						}
+						fdrArray.push(fdrproductObj);
+					}
+				});
+				for(h in resultData) {
+					if(resultData[h].planType == 1) {
+						fdrTemp = resultData[h].ratio;
+					} else if(resultData[h].planType == 2) {
+						mj_upToPrice = resultData[h].upToPrice;
+						mj_offPrice = resultData[h].offPrice;
+					}
+				}
+				for(var i = 0; i < fdrArray.length; i++) {
+					if(fdrArray.length == 0) {
+						fdrNer = 0;
+					} else {
+						fdrNer += Number(fdrArray[i].otpr) * Number(fdrArray[i].nums); //总价
+						fdrUltimatePrice_zk = fdrNer * (fdrTemp / 100);
+						if(fdrNer >= mj_upToPrice) {
+							fdrUltimatePrice_mj = fdrNer - mj_offPrice;
+						} else {
+							fdrUltimatePrice_mj = fdrNer;
+						}
+					}
+				}
+				if(fdrUltimatePrice_zk > fdrUltimatePrice_mj) {
+					totlePric_zkMj = fdrUltimatePrice_mj;
+				} else {
+					totlePric_zkMj = fdrUltimatePrice_zk;
+				}
+			}
+			fullDiscountReduction();
+
+			//折扣
+			function discount() {
+				var zkArray = [];
+				var zkNer = 0;
+				var zkTemp = 0;
+				$('.shopCardetails_row2').each(function() {
+					var zkVal = $(this).find('.zk').val();
+					var mjVal = $(this).find('.mj').val();
+					if(zkVal == 1 && mjVal == 0) {
+						var zkgdId = $(this).attr("data-proId");
+						var zktpr = $(this).find('.shopPirce').attr("data-itemPirce");
+						var zkgdname = $(this).find('.goodsName').attr("data-relName");
+						var zkspinner = $(this).find('.shopSpinnerInput').val();
+						var zkproductObj = {
+							ogdId: zkgdId,
+							otpr: zktpr,
+							ogdname: zkgdname,
+							nums: zkspinner
+						}
+						zkArray.push(zkproductObj);
+					}
+				});
+				for(zk in resultData) {
+					if(resultData[zk].planType == 1) {
+						zkTemp = resultData[zk].ratio;
+						mj_upToPrice = resultData[h].upToPrice;
+						mj_offPrice = resultData[h].offPrice;
+					}
+				}
+				for(var i = 0; i < zkArray.length; i++) {
+					if(zkArray.length == 0) {
+						zkNer = 0;
+					} else {
+						zkNer += Number(zkArray[i].otpr) * Number(zkArray[i].nums); //总价
+						zkUltimatePrice_zk = zkNer * (zkTemp / 100);
+					}
+				}
+			}
+			discount();
+
+			//满减
+			function fullReduction() {
+				var mjArray = [];
+				var mjNer = 0;
+				var mjTemp = 0;
+				var mj2_upToPrice = 0;
+				var mj2_offPrice = 0;
+				$('.shopCardetails_row2').each(function() {
+					var zkVal = $(this).find('.zk').val();
+					var mjVal = $(this).find('.mj').val();
+					if(zkVal == 0 && mjVal == 1) {
+						var mjgdId = $(this).attr("data-proId");
+						var mjtpr = $(this).find('.shopPirce').attr("data-itemPirce");
+						var mjgdname = $(this).find('.goodsName').attr("data-relName");
+						var mjspinner = $(this).find('.shopSpinnerInput').val();
+						var mjproductObj = {
+							ogdId: mjgdId,
+							otpr: mjtpr,
+							ogdname: mjgdname,
+							nums: mjspinner
+						}
+						mjArray.push(mjproductObj);
+					}
+				});
+				for(mj in resultData) {
+					if(resultData[mj].planType == 2) {
+						mjTemp = resultData[mj].ratio;
+						mj2_upToPrice = resultData[mj].upToPrice;
+						mj2_offPrice = resultData[mj].offPrice;
+					}
+				}
+				for(var i = 0; i < mjArray.length; i++) {
+					if(mjArray.length == 0) {
+						mjNer = 0;
+					} else {
+						mjNer += Number(mjArray[i].otpr) * Number(mjArray[i].nums); //总价
+						if(mjNer >= mj2_upToPrice) {
+							mjUltimatePrice_mj = mjNer - mj2_offPrice;
+						} else {
+							mjUltimatePrice_mj = mjNer;
+						}
+					}
+				}
+			}
+			fullReduction();
+
+			//计算总价格
+			function getTotalPrice() {
+				var tCount = naultimatePrice + ultimatePrice + tjultimatePrice + totlePric_zkMj + zkUltimatePrice_zk + mjUltimatePrice_mj;
+				$('#combined').html(tCount.toFixed(2));
+			};
+			getTotalPrice();
+
+			//增减单品数量
+			$('.increase,.decrease').on('click', function() {
+				countIndex = $(this).parents('.shopCardetails_row2').index(); //商品下标
+				countNum = $(this).siblings('.shopSpinnerInput').val(); //数量
+				if($(this).attr("class") == 'increase') { //加
+					countNum++;
+					localityDataList[countIndex].num = countNum;
+				} else if($(this).attr("class") == 'decrease') { //减
+					countNum--;
+					if(countNum == 0) {
+						localityDataList.splice(countIndex, 1);
+						$('.shopCardetails_row2').eq(countIndex).remove();
+						if(localityDataList.length == 0) {
+							$('.show').show();
+							location.reload();
+						}
+					} else {
+						localityDataList[countIndex].num = countNum;
+					}
+				}
+				localStorage.setItem("dataList", JSON.stringify(localityDataList));
+				$(this).siblings('.shopSpinnerInput').val(countNum);
+				var a = JSON.parse(localStorage.getItem("dataList"));
+				console.log();
+				unitPrice(); //计算单价
+				buyGift(); //买赠
+				specialOffer(); //特价
+				noActivity(); //不参加任何活动
+				fullDiscountReduction(); //满减和折扣
+				discount(); //折扣
+				fullReduction(); //满减
+				getTotalPrice(); //总价
+				$('.panel_ul li').each(function() {
+					if($(this).hasClass("actionTF")) {
+						jsCount = 1;
+						return false;
+					}
+				})
+				couponPrice(jsCount);
+			});
+
+			function emptyClear() {
+				$('#combined').html('0.00');
+				//$('.show').show();
+			}
+
+			//清空购物车
+			$('.clear').click(function() {
+				var empty = JSON.parse(localStorage.getItem("dataList"));
+				if(empty.length == 0) {
+					// alert("购物车已经是空");
+					mui.toast('购物车已经是空');
+				} else {
+					empty = [];
+					localStorage.setItem("dataList", JSON.stringify(empty));
+					var empty2 = JSON.parse(localStorage.getItem("dataList"));
+					$('.shopCardetails_row2').remove();
+					emptyClear();
+					location.reload();
+				}
+			});
+
+			function voucher() {
+				var htmlVoucher = '';
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					url: base + "sale_inte/uesr/coupons.action",
+					data: {
+						"shopID": relatedobj.sh,
+						"enterpriseID": relatedobj.en,
+						"pinpaiID": relatedobj.pi
+					},
+					success: function(result) {
+						jishu = [];
+						console.log(result);
+						for(var i = 0; i < result.data.length; i++) {
+							if(result.data[i].status == 0) {
+								jishu.push(result.data[i]);
+								htmlVoucher += "<li data-id='" + result.data[i].couId + "'  data-rel='0' data-couType='" + result.data[i].couType + "' data-discount='" + result.data[i].discount + "'>"
+								htmlVoucher += "<img class='selectCoupons' src='../img/comment_3.png' />"
+								htmlVoucher += "<p class='p1'>小玎小珰</p>"
+								htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+								if(result.data[i].couType == 2){
+									htmlVoucher += "<span class='couponDescription'>此优惠券不适用于套餐</span>"
+								}
+								htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i].endDate.substring(10, -1) + "</span></p>"
+								htmlVoucher += "<span class='status' style='color:#369dfc;'>有效</span>"
+								htmlVoucher += "</li>"
+							} else if(result.data[i].status == 1) {
+								htmlVoucher += "<li data-id='" + result.data[i].couId + "'>"
+								htmlVoucher += "<div class='panlzz'>"
+								htmlVoucher += "<p class='p1'>小玎小珰</p>"
+								htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+								htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i].endDate.substring(10, -1) + "</span></p>"
+								htmlVoucher += "<span class='status' style='color:red;'>已使用</span>"
+								htmlVoucher += "</div>"
+								htmlVoucher += "</li>"
+							} else if(result.data[i].status == 3) {
+								htmlVoucher += "<li data-id='" + result.data[i].couId + "'>"
+								htmlVoucher += "<div class='panlzz'>"
+								htmlVoucher += "<p class='p1'>小玎小珰</p>"
+								htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+								htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i].endDate.substring(10, -1) + "</span></p>"
+								htmlVoucher += "<span class='status' style='color:red;'>已过期</span>"
+								htmlVoucher += "</div>"
+								htmlVoucher += "</li>"
+							}
+						}
+						$('.panel_ul').html(htmlVoucher);
+						$('.panel_ul li').click(function() {
+							var arrgs = JSON.parse(localStorage.getItem("dataList"));
+							if(arrgs.length == 0) {
+								// alert("请选择商品后再选择优惠券");
+								mui.toast('请选择商品后再选择优惠券');
+							} else {
+								var dataRel = $(this).attr("data-rel");
+								if(dataRel == 0) {
+									$('.selectCoupons').attr("src", "../img/comment_3.png");
+									$(this).find('.selectCoupons').attr("src", "../img/comment_5.png");
+									$(this).addClass("actionTF").siblings().removeClass("actionTF");
+								}
+							}
+						});
+						$('#available').html(jishu.length);
+					}
+				});
+			}
+			voucher();
+
+			function win() {
+				$('.panel_ul li').animate({
+					top: "30px"
+				})
+			}
+
+			$('.coupons').click(function() {
+				$('#yhjImg').attr("src", "../img/comment_5.png");
+				$('.marks').fadeIn();
+				win();
+			})
+
+			$('#cancel').click(function() {
+				$('.marks').fadeOut();
+				$('#yhjImg').attr("src", "../img/comment_3.png");
+				$('.panel_ul li').find('.selectCoupons').attr("src", "../img/../img/comment_3.png");
+				$('.panel_ul li').removeClass("actionTF");
+				$('.panel_ul li').animate({
+					top: "-100px"
+				})
+			})
+
+			function couponPrice(_jsCount) {
+				if(_jsCount == 1) {
+					if($('.actionTF').attr("data-coutype") == 1) {
+						var couType = $('.actionTF').attr("data-discount");
+						var totalPricejf = $('#combined').text();
+						var jhjg = Number(totalPricejf) - Number(couType);
+						if(jhjg < 0) {
+							$('#combined').html(0.00);
+						} else {
+							$('#combined').html(jhjg.toFixed(2));
+						}
+					} else if($('.actionTF').attr("data-coutype") == 2) {
+						var ntert = [];
+						$('.shopCardetails_row2').each(function() {
+							if($(this).attr("data-playtype") == 1) {
+								ntert.push($(this).find('.shopPirce').attr("data-itempirce"));
+							}
+						})
+						var maxVal = Math.max.apply(null, ntert);
+						var ComplimentaryFinalValue = Number($('#combined').text()) - Number(maxVal);
+						$('#combined').html(ComplimentaryFinalValue.toFixed(2));
+					}
+				}
+			}
+
+			$('#confirm').click(function() {
+				$('.panel_ul li').each(function() {
+					if($(this).hasClass("actionTF")) {
+						jsCount = 1;
+						return false;
+					}
+				})
+				$('.marks').fadeOut();
+				$('.panel_ul li').animate({
+					top: "-100px"
+				})
+				couponPrice(jsCount);
+			});
+			//订单
+			function dd(_arrText) {
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					url: base + "sale_inte/order/submit.action",
+					data: {
+						"data": JSON.stringify(highestData)
+					},
+					ContentType: "application/json",
+						beforeSend: function() {
+							$('.marksYdn').show();
+						},
+					success: function(resultAsx) {
+						console.log(resultAsx);
+						if(resultAsx.data.totalPrice == '0.00') {
+							// alert("下单成功");
+							mui.toast('下单成功');
+							var emptyArr = [];
+							localStorage.setItem("dataList",JSON.stringify(emptyArr));
+							location.reload();
+						} else {
+							var orderId = resultAsx.data.orderNo;
+							function genQueryData() {
+								var result;
+								$.ajax({
+									type: "post",
+									url: base + "sale_inte/pay/wxPrePay.action",
+									headers: {
+										"Authorization": Authorization
+									},
+									data: {
+										"ordId": resultAsx.data.orderId
+									},
+									dataType: "json",
+									async: false,
+									success: function(jsonData) {
+										if(jsonData != undefined && jsonData != null && jsonData != "") {
+											result = jsonData.data;
+										}
+									}
+								});
+								return result;
+							}
+							function onBridgeReady() {
+								WeixinJSBridge.invoke('getBrandWCPayRequest', genQueryData(), function(res) {
+									if(res.err_msg == "get_brand_wcpay_request:ok") {
+										var emptyArr = [];
+										localStorage.setItem("dataList",JSON.stringify(emptyArr));
+										location.reload();
+									}
+								});
+							}
+
+							function init() {
+								if(typeof WeixinJSBridge == "undefined") {
+									if(document.addEventListener) {
+										document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+									} else if(document.attachEvent) {
+										document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+										document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+									}
+								} else {
+									onBridgeReady();
+								}
+							}
+							init();
+						}
+						
+					},
+					complete: function() {
+						ican = uuid();
+						$('.marksYdn').hide();
+					}
+				});
+			}
+
+			function orderDataDtructure(_ice) {
+				var dataxAx = {};
+				var data = [];
+				var getStructure = JSON.parse(localStorage.getItem("dataList"));
+				for(var i = 0; i < getStructure.length; i++) {
+					var makes = [];
+					var mats = [];
+					var tastes = [];
+					var makesObject = {};
+					var tastesObject = {};
+					if(getStructure[i].proType == 1) {
+						for(var j = 0; j < getStructure[i].makes.length; j++) {
+							if(getStructure[i].makes[j].practiceId == '') {
+								makes = [];
+							} else {
+								makesObject = {
+									practiceId: getStructure[i].makes[j].practiceId,
+									makesName: getStructure[i].makes[j].makesName
+								}
+								makes.push(makesObject);
+							}
+						}
+
+						if(getStructure[i].mats[0].proMatId == '') {
+							mats = [];
+						} else {
+							mats = [{
+								proMatId: getStructure[i].mats[0].proMatId,
+								matsName: getStructure[i].mats[0].matsName,
+								matShopPirce: getStructure[i].mats[0].matShopPirce
+							}];
+						}
+
+						for(var t = 0; t < getStructure[i].tastes.length; t++) {
+							if(getStructure[i].tastes[t].tasteId == '') {
+								tastes = [];
+							} else {
+								tastesObject = {
+									tasteId: getStructure[i].tastes[t].tasteId,
+									tastesName: getStructure[i].tastes[t].tastesName
+								}
+								tastes.push(tastesObject);
+							}
+						}
+						dataxAx = {
+							proId: getStructure[i].proId,
+							num: getStructure[i].num,
+							proType: 1,
+							makes,
+							mats,
+							tastes
+						};
+						data.push(dataxAx);
+
+					} else if(getStructure[i].proType == 2) {
+						var taocan = [];
+						var taocanObject = {};
+						for(var q = 0; q < getStructure[i].dataTaoCanArray.length; q++) {
+							for(var w = 0; w < getStructure[i].dataTaoCanArray[q].makes.length; w++) {
+								if(getStructure[i].dataTaoCanArray[q].makes[w].practiceId == '') {
+									makes = [];
+								} else {
+									makesObject = {
+										practiceId: getStructure[i].dataTaoCanArray[q].makes[w].practiceId,
+										makesName: getStructure[i].dataTaoCanArray[q].makes[w].makesName
+									}
+									makes.push(makesObject);
+								}
+							}
+							if(getStructure[i].dataTaoCanArray[q].mats[0].proMatId == '') {
+								mats = [];
+							} else {
+								mats = [{
+									proMatId: getStructure[i].dataTaoCanArray[q].mats[0].proMatId,
+									matsName: getStructure[i].dataTaoCanArray[q].mats[0].matsName,
+									matShopPirce: getStructure[i].dataTaoCanArray[q].mats[0].matShopPirce
+								}];
+							}
+
+							for(var e = 0; e < getStructure[i].dataTaoCanArray[q].tastes.length; e++) {
+								if(getStructure[i].dataTaoCanArray[q].tastes[e].tasteId == '') {
+									tastes = [];
+								} else {
+									tastesObject = {
+										tasteId: getStructure[i].dataTaoCanArray[q].tastes[e].tasteId,
+										tastesName: getStructure[i].dataTaoCanArray[q].tastes[e].tastesName
+									}
+									tastes.push(tastesObject);
+								}
+							}
+							dataxAx = {
+								proId: getStructure[i].dataTaoCanArray[q].proId,
+								combID: getStructure[i].dataTaoCanArray[q].combID,
+								makes,
+								mats,
+								tastes
+							};
+							taocan.push(dataxAx);
+						}
+						taocanObject = {
+							proId: getStructure[i].proId,
+							proType: 2,
+							num: 1,
+							taocan
+						}
+						data.push(taocanObject);
+					}
+				}
+
+				highestData = {
+					orderID: ican,
+					createTime: colData,
+					shopID: relatedobj.sh,
+					enterpriseID: relatedobj.en,
+					pinpaiID: relatedobj.pi,
+					ordSource: 1,
+					quanIds: _ice,
+					data
+				}
+			}
+			$('.settlement').click(function() {
+				var isMoble = localStorage.getItem("isMobile");
+				var arrText = [];
+				var ert = 0;
+				var getLocaShopCat = JSON.parse(localStorage.getItem("dataList"));
+				for(f in getLocaShopCat) {
+					ert += Number(getLocaShopCat[f].num);
+				}
+				if(getLocaShopCat.length == 0 || getLocaShopCat == null) {
+					// alert('购物车为空,请选择商品后结算');
+					mui.toast('购物车为空,请选择商品后结算');
+				}else if(isMoble == 0 || isMoble == null){
+					// alert("请先完善个人信息");
+					mui.toast('请先完善个人信息');
+					location.href = 'personal_information.html';
+				} else {
+					var ice = [];
+					$('.panel_ul li').each(function() {
+						if($(this).hasClass("actionTF")) {
+							var dataIdYhj = $(this).attr("data-id");
+							ice.push(dataIdYhj);
+						}
+					})
+					console.log(ice);
+					orderDataDtructure(ice);
+					$('.actionTF').each(function() {
+						var dataId = $(this).attr("data-id");
+						arrText.push(dataId);
+					})
+					dd(arrText);
+				}
+			})
+		</script>
+	</body>
+
+</html>

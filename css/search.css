@@ -1,0 +1,188 @@
+.seacrch-chunk {
+	width: 100%;
+	height: 85px;
+	padding: 0 5%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	z-index: 20;
+}
+
+.back-btn {
+	width: 28px;
+	height: 27px;
+}
+
+#count {
+	width: 25px;
+	height: 25px;
+	line-height: 25px;
+	position: fixed;
+	bottom: 24%;
+	right: 4%;
+	z-index: 14;
+	background-color: red;
+	border-radius: 50%;
+	text-align: center;
+	color: #fff;
+}
+
+.seacrch-chunk input {
+	display: block;
+	width: 68%;
+	height: 60px;
+	padding-left: 30px;
+	color: #333333;
+	font-size: 20px;
+	margin-bottom: 0;
+	background-color: #f4f4f4;
+	border: none;
+}
+
+.seacrch-btn {
+	font-size: 25px;
+	color: #333333;
+}
+
+.seacrch-hot {
+	padding: 0 5%;
+	margin-top: 55px;
+}
+
+.seacrch-hot p {
+	font-size: 22px;
+	color: #333333;
+	margin-bottom: 15px;
+}
+
+.seacrch-hot span {
+	float: left;
+	padding: 15px 20px;
+	color: #666666;
+	background-color: #f7f7f7;
+	margin-right: 15px;
+	margin-bottom: 15px;
+	font-size: 20px;
+	border-radius: 5px;
+}
+
+.search_goodsList {
+	padding: 30px 2.5% 0 2.5%;
+}
+
+.list_sub_ul li {
+	float: left;
+}
+
+.order-liStyle {
+	padding-bottom: 30px;
+	position: relative;
+}
+
+.picture {
+	width: 16.8%;
+	float: left;
+	border-radius: 5px;
+}
+
+.products_description {
+	width: 68%;
+	margin: 0 15px;
+}
+
+.list_sub_title {
+	color: #000;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.kyo {
+	color: #3c3c3c;
+	font-size: 18px;
+	margin: 10px 0;
+}
+
+.kyo span {
+	margin: 0;
+}
+
+.order-figther {
+	width: 100%;
+	margin-top: 10px;
+	display: flex;
+	justify-content: flex-start;
+}
+
+.withReducedActivity {
+	margin-left: calc(16.8% + 15px);
+	padding-bottom: 10px;
+	/*background-image: url(../img/index_sj.png);*/
+	background-position: top right;
+	background-repeat: no-repeat;
+	background-size: 18px 13px;
+}
+
+.withReducedActivity section {
+	padding-left: 50px;
+	background-position: 0 60%;
+	background-repeat: no-repeat;
+	background-size: 40px 23px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.withReducedActivity section:first-child {
+	margin-top: 30px;
+}
+
+.ts {
+	width: 100%;
+	height: 200px;
+	font-size: 24px;
+	text-align: center;
+	line-height: 200px;
+	display: none;
+}
+
+.purchase_quantity {
+	width: 6%;
+	position: absolute;
+	right: 4%;
+	top: 14%;
+	z-index: 12;
+}
+
+.list_liStyle {
+	padding: 20px 0;
+	position: relative;
+	border-bottom: #EAEAEA solid 1px;
+}
+
+.list {
+	text-align: center;
+	font-size: 20px;
+}
+
+.list li {
+	text-align: left;
+}
+
+.order-bgHide {
+	width: 100%;
+	padding-bottom: 0;
+	background: none;
+	border: none;
+}
+
+.diyIcon {
+	width: 12%;
+	position: fixed;
+	bottom: 20%;
+	right: 4%;
+	z-index: 13;
+}
+.priMask,.maskGoodsDetail{
+	bottom: 0;
+}

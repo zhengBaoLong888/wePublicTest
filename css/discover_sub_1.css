@@ -1,0 +1,46 @@
+html,body,.mui-content{
+	height: 100%;
+}
+
+.conent-main{
+	width: 100%;
+	position: relative;
+	height: calc(100% - 86px);
+}
+.activityIntroduced-top{
+	position: absolute;
+	top: 590px;
+	left: 110px;
+	z-index: 11;
+}
+.activityIntroduced-top li{
+	list-style-type: square;
+}
+.activityIntroduced-bottom{
+	position: absolute;
+	top: 780px;
+	left: 110px;
+	z-index: 11;
+}
+.conent-main ul li{
+	line-height: 30px;
+	color: #6b6a65;
+	font-size: 19px;
+	font-family: "微软雅黑";
+}
+.participate-btn{
+	width: 280px;
+  height: 60px;
+  position: absolute;
+  top: 890px;
+  left: 180px;
+  z-index: 11;
+}
+
+.conent-main-bg{
+	position: absolute;
+	top: -1px;
+	left: 0;
+	z-index: 10;
+	height: 100%;
+}

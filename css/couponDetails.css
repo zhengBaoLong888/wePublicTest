@@ -1,0 +1,88 @@
+body{
+	background-color: #fff;
+}
+.content-main{
+	width: 100%;
+}
+.panel{
+	padding: 20px 2%;
+}
+.panel_ul li {
+    width: 599px;
+    height: 244px;
+    padding-right: 10px;
+    background-image: url(../img/zeng.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 599px 244px;
+    position: relative;
+}
+.panel_ul li p{
+	display: block;
+	width: 410px;
+	position: absolute;
+	right: 4%;
+	z-index: 21;
+	color: #474747;
+	text-align: center;
+}
+.panel_ul li .p1{
+	top: 15px;
+	right: 15px;
+	font-size: 22px;
+	text-align: left;
+}
+.panel_ul li .p2{
+	top: 90px;
+	font-size: 30px;
+}
+.panel_ul li .p3{
+	top: 190px;
+	font-size: 17px;
+	color: #989898;
+	border-top:#e2e2e2 solid 2px;
+	padding-top: 10px;
+	text-align: left;
+}
+.selectCoupons{
+	width: 6%;
+	position: absolute;
+	top: 10px;
+	right: 5%;
+	z-index: 22;
+}
+.actionTF{
+	
+}
+.status{
+	position: absolute;
+	bottom:70px;
+	right:4%;
+}
+.panlzz{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background-color: rgba(255,255,255,0.7);
+}
+.panlzz p,.panlzz span{
+	opacity: 0.7;
+}
+.numAva{
+	color: #fff;
+	padding: 3px 10px;
+	font-size: 18px;
+	margin-left: 52%;
+	background:-webkit-linear-gradient(left,#74F195,#C8FF9A);
+	background:-o-linear-gradient(right,#74F195,#C8FF9A);
+	background:-moz-linear-gradient(right,#74F195,#C8FF9A);
+	background:linear-gradient(to right,#ff7111,#e33b17);
+	border:#ff6e52 solid 1px;
+}
+.couponDescription{
+	position: absolute;
+	bottom: 65px;
+	left: 180px;
+}

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>优惠券详细</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/couponDetails.css" />
+	</head>
+
+	<body>
+		<article class="content-main">
+			<aside class="commenBack-head">
+				<a id="shopBack" onclick="history.back();">优惠券</a>
+			</aside>
+			<div class="panel">
+				<ul class="panel_ul">
+
+				</ul>
+			</div>
+		</article>
+
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script>
+			var base = localStorage.getItem("base");
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+
+			function voucher() {
+				var htmlVoucher = '';
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					url: base + "sale_inte/uesr/coupons.action",
+					data: {
+						"shopID": relatedobj.sh,
+						"enterpriseID": relatedobj.en,
+						"pinpaiID": relatedobj.pi
+					},
+					success: function(result) {
+						console.log(result);
+						for(var i = 0; i < result.data.length; i++) {
+							htmlVoucher += "<li data-id='" + result.data[i].couId + "' data-statue = '" + result.data[i].status + "'>"
+							htmlVoucher += "<div class='z-marks-withe'>"
+							htmlVoucher += "<p class='p1'>小玎小珰</p>"
+							htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
+							if(result.data[i].couType == 2){
+									htmlVoucher += "<span class='couponDescription'>此优惠券不适用于套餐</span>"
+								}
+							htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i].endDate.substring(10, -1) + "</span></p>"
+							if(result.data[i].status == 0) {
+								htmlVoucher += "<span class='status' style='color:#369dfc;'>有效</span>"
+							} else if(result.data[i].status == 1) {
+								htmlVoucher += "<span class='status' style='color:red;'>已使用</span>"
+							} else if(result.data[i].status == 3) {
+								htmlVoucher += "<span class='status' style='color:red;'>已过期</span>"
+							}
+							htmlVoucher += "</div>"
+							htmlVoucher += "</li>"
+						}
+						$('.panel_ul').html(htmlVoucher);
+
+						$('.panel_ul li').each(function() {
+							var statue = $(this).attr("data-statue");
+							if(statue != 0) {
+								$(this).find('.z-marks-withe').addClass('panlzz');
+							}
+						})
+					}
+				});
+			}
+			voucher();
+		</script>
+	</body>
+
+</html>

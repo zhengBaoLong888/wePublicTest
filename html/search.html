@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=640,minimum-scale=0.4,maximum-scale=2.0,user-scalable=no" />
+		<title>搜索</title>
+		<link href="../css/mui.css" rel="stylesheet" />
+		<link rel="stylesheet" href="../css/commen.css" />
+		<link rel="stylesheet" href="../css/search.css" />
+	</head>
+	<style>
+		.jiage {
+			display: none;
+		}
+	</style>
+
+	<body class="entirety-style entirety-bg">
+		<div class="mui-content">
+			<article class="font-style">
+				<article class="seacrch-chunk">
+					<a onclick="history.back();" class="back-btn"><img src="../img/comment_back.png" /></a>
+					<input id="text_val" type="text" autofocus="autofocus" placeholder="小玎小珰   最高立减50元" />
+					<p class="seacrch-btn">搜索</p>
+				</article>
+				<div style="height: 85px;"></div>
+				<article class="search_goodsList">
+					<ul class="list">
+
+					</ul>
+				</article>
+				<div id="count">0</div>
+				<!--选择口味弹窗-->
+				<aside class="new_tasteChoose">
+					<div class="row1">
+						<div class="row1_goodsName">
+							<img class="row1_col_1" src="" />
+							<div class="row2_col_2">
+								<p class="row2_col_2_p1">西瓜沙冰</p>
+								<div class="row2_col_2_p2">价格:<span>¥</span><span id="taske_pirce">15</span></div>
+								<div class="row2_detils"></div>
+							</div>
+						</div>
+						<input id="numCount" type="hidden" value="1" />
+						<div class="row2">
+							<p>做法</p>
+							<ul class="row2_type1 zf1"></ul>
+							<ul class="zf2"></ul>
+							<div class="clearBoth"></div>
+							<p>加料</p>
+							<ul class="row2_type2"></ul>
+							<div class="clearBoth"></div>
+							<p>口味</p>
+							<ul class="row2_type3 kw1"></ul>
+							<ul class="kw2"></ul>
+							<div class="clearBoth"></div>
+						</div>
+
+						<div class="row3">
+							<span id="cancel">取消</span>
+							<span id="confirm">加入购物车</span>
+						</div>
+					</div>
+				</aside>
+
+				<a href="discover_sub_2.html">优惠券</a>
+
+				<a class="diyIcon" onclick="jumpPage();">
+					<img id="catIcon" src="../img/index_shoppingCart.png" />
+				</a>
+
+				<div class="priMask">
+					<div class="maskGoodsDetail">
+						<div class="close">
+							<img src="../img/close.png" />
+						</div>
+						<img id="goodImg" src="../img/1.png" />
+						<div class="bbq">
+							<p class="pp1">西瓜鲜果沙冰</p>
+							<p class="pp2"><span>15</span>元</p>
+						</div>
+						<div id="introduce">我是新品，相比苹果沙冰，我的口感要更好， 在这个夏天来一杯是最合适不过了。</div>
+					</div>
+				</div>
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script type="text/javascript" src="../js/script.js"></script>
+		<script>
+			var goodsList = JSON.parse(localStorage.getItem("products"));
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var relatedobj = JSON.parse(localStorage.getItem("reltArray")); //品牌
+			var base = localStorage.getItem("base");
+			var dataArray = {};
+			var dataxAx = {};
+			var taskProIdVal = ''; //proId
+			var taskeSlectorIndex, orderGoodsName, picture,detal;
+			//var pinPaiId = '33';
+			console.log(goodsList);
+
+			function bodyScroll(event) {
+				event.preventDefault();
+			}
+
+			getShopCatNum();
+
+			window.addEventListener('pageshow', function() {
+				getShopCatNum();
+			});
+
+			//加入购物车按钮
+			$('#confirm').click(function() {
+				var jl1_send = '';
+				var jl1_name = '';
+				var jl2_send = 0;
+				var kw1_send = '';
+				var kw1_name = '';
+
+				//加料
+				if($('.row2_type2').length == 0) {
+					$('.row2_type2').html('此商品暂不能加料');
+				} else {
+					$('.row2_type2 li').each(function() {
+						if($(this).hasClass('action_makes')) {
+							jl1_send = $(this).attr("data-id");
+							jl2_send = $(this).attr("data-ingredientprice");
+							jl1_name = $(this).attr("data-name");
+							return false;
+						}
+					});
+				}
+				//口味
+				$('.kw1 li').each(function() {
+					if($(this).hasClass('action_makes')) {
+						kw1_send = $(this).attr("data-id");
+						kw1_name = $(this).attr("data-name");
+						return false;
+					}
+				});
+				var proId_val = $('.list_liStyle').eq(taskeSlectorIndex).find(".proId").val();
+				var proName = $('.list_liStyle').eq(taskeSlectorIndex).find(".list_sub_title").text();
+				var ismoneyoff = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-ismoneyoff"); //满减
+				var isbargain = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-isbargain"); //特价
+				var ispresented = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-ispresented"); //赠送
+				var isdiscount = $('.list_liStyle').eq(taskeSlectorIndex).attr("data-isdiscount"); //打折
+
+				getGoodsArray(jl1_send, jl1_name, jl2_send, kw1_send, kw1_name, ismoneyoff, isbargain, ispresented, isdiscount, proId_val, proName);
+				getShopCatNum();
+				$('#explain,.new_tasteChoose').hide();
+				document.querySelector('.new_tasteChoose').removeEventListener('touchmove', bodyScroll, false);
+			});
+
+			var jiage = '';
+			$('.seacrch-btn').click(function() {
+				$.ajax({
+					type: "post",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						"Authorization": Authorization
+					},
+					data: {
+						"shopID": relatedobj.sh,
+						"enterpriseID": relatedobj.en,
+						"pinpaiID": relatedobj.pi
+					},
+					url: base + "sale_inte/salespromotion/getpromotion.action",
+					async: false,
+					success: function(result) {
+						console.log(result);
+						var text_val = $('#text_val').val().replace(/\s+/g, ""); //去除空格
+						$('.list').html('');
+						if(text_val == '') {
+							$('.list').html('搜索商品结果为空');
+						} else {
+							var html = '';
+							for(i in goodsList) {
+								var a = "flase";
+								for(var b = 0; b < result.data.length; b++) {
+										console.log(result.data[b].planType);
+									if(result.data[b].planType == 3 && goodsList[i].isBargain == 1) {
+										a = "ture";
+										break;
+									} else {
+										a = "false";
+									}
+								}
+								var a1 = '';
+								var activity1 = '';
+								var activity2 = '';
+								var activity3 = '';
+								var activity4 = '';
+								if(goodsList[i].proName.indexOf(text_val) != -1) {
+									html += "<li class='list_liStyle' data-isBargain='" + goodsList[i].isBargain + "' data-isPresented='" + goodsList[i].isPresented + "'  data-isDiscount='" + goodsList[i].isDiscount + "' data-isMoneyOff='" + goodsList[i].isMoneyOff + "'>"
+									html += "<ul class='list_sub_ul'>"
+									html += "<img class='picture' src='" + goodsList[i].imgs[0].path + "' />"
+									html += "<li class='products_description'>"
+									html += "<input class='inputImg' type='hidden' value='" + goodsList[i].imgs[0].path + "'/>"
+									html += "<div class='list_sub_title'>" + goodsList[i].proName + "</div>"
+									html += "<p class='kyo'>"
+									if(a == "ture") {
+										html += "<span>价格￥"+goodsList[i].price+"元</span>"
+										html += "<span style='margin-left:20px;text-decoration:line-through;'>原价:"+goodsList[i].origionPrice+"元</span>"
+									} else {
+										html += "<span>价格:"+goodsList[i].origionPrice+"元</span>"
+									}
+									html += "</p>"
+									html += "<div class='order-bgHide spms'>" + goodsList[i].remark + "</div>"
+									html += "</li>"
+									html += "</ul>"
+									html += "<div class='clearBoth'></div>"
+									html += "<div class='withReducedActivity'>"
+									for(j in result.data) { //活动数据
+										if(result.data[j].planType == 4) {
+											a1 += "<span>买" + result.data[j].upToCount + "赠" + result.data[j].freeCount + "</span>"
+											a1 += "<span class='comma'>,</span>"
+										} else {}
+
+										if(goodsList[i].isBargain == true && goodsList[i].isBargain == 1 && result.data[j].planType == 3) { //特价
+											activity1 = "<section style='background-image: url(../img/tejia.png);'>" + result.data[j].planName + "</section>"
+										} else {}
+										if(goodsList[i].isPresented == true && goodsList[i].isPresented == 1 && result.data[j].planType == 4) { //买赠	
+											activity2 = "<section class='s_mz' style='background-image: url(../img/manzeng.png);'>" + a1 + "</section>"
+										} else {}
+										if(goodsList[i].isDiscount == true && goodsList[i].isDiscount == 1 && result.data[j].planType == 1) { //打折
+											var ratio = result.data[j].ratio / 10;
+											activity3 = "<section style='background-image: url(../img/zhekou.png);' data-radiu='" + result.data[j].ratio + "'>" + ratio + "折</section>"
+										} else {}
+										if(goodsList[i].isMoneyOff == true && goodsList[i].isMoneyOff == 1 && result.data[j].planType == 2) { //满减
+											activity4 = "<section style='background-image: url(../img/manjian.png);'data-upToPrice='" + result.data[j].upToPrice + "' 'data-upToPrice='" + result.data[j].offPrice + "'>满" + result.data[j].upToPrice + "减" + result.data[j].offPrice + "</section>"
+										} else {}
+									}
+									html += activity1
+									html += activity2
+									html += activity3
+									html += activity4
+									html += "</div>"
+									html += "<img class='purchase_quantity' src='../img/dishesDetail_8.png' />"
+									html += "<input class='proId' type='hidden' value='" + goodsList[i].proId + "'/>"
+									html += "</li>"
+									$('.list').html(html);
+								} else {
+
+								}
+							}
+							if($('.list').is(":empty")) {
+								$('.list').html('搜索商品结果为空');
+							}
+						}
+						$('.comma:last-child').css("display", "none");
+						//商品详细与口味选择
+						$('.list_liStyle').click(function() {
+							taskeSlectorIndex = $(this).index();
+							orderGoodsName = $(this).find('.list_sub_title').text();
+							detal = $(this).find('.spms').text();
+							var proIdVal = $(this).find('.proId').val();
+							picture = $(this).find('.picture').attr("src");
+							$('.row1_col_1').attr("src", picture);
+							$('.row2_col_2_p1').html(orderGoodsName);
+							$('.row2_detils').html(detal);
+							$('#taske_pirce').html($('.list_liStyle').eq(taskeSlectorIndex).find('.price').text());
+							$('.new_tasteChoose').show();
+							getTask(proIdVal);
+							document.querySelector('.new_tasteChoose').addEventListener('touchmove', bodyScroll, false);
+							jiage = $(this).find('.price').text();
+						})
+					}
+				});
+			})
+			$('.close').click(function() {
+				document.querySelector('.priMask').removeEventListener('touchmove', bodyScroll, false);
+				$('.priMask').hide();
+			})
+
+			//取消按钮
+			$('#cancel').click(function() {
+				document.querySelector('.new_tasteChoose').removeEventListener('touchmove', bodyScroll, false);
+				$('.new_tasteChoose').hide();
+			});
+		</script>
+
+	</body>
+
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="../css/discover_details.css" />
+	</head>
+
+	<body>
+		<div id="detail">
+
+		</div>
+		<script type="text/javascript" src="../js/jquery-1.8.3.min.js"></script>
+		<script>
+			var base = localStorage.getItem("base");
+			var token = localStorage.getItem("token");
+			var Authorization = "Bearer " + token;
+			var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+			var repaksVal = localStorage.getItem("repaksVal");
+			$.ajax({
+				type: "post",
+				url: base + "sale_inte/system/adverTest.action",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": Authorization
+				},
+				data: {
+					"pinpaiId": relatedobj.pi,
+					"adverId": repaksVal
+				},
+				success: function(result) {
+					console.log(result);
+					$('#detail').html(result.data);
+				}
+			});
+		</script>
+	</body>
+
+</html>

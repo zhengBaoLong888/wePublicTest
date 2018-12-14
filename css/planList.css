@@ -1,0 +1,114 @@
+body {
+	font-family: "黑体-繁";
+}
+
+.shopName {
+	padding: 25px 5%;
+	border-bottom: #eaeaea solid 1px;
+	color: #333333;
+	font-size: 30px;
+}
+
+.kpi {
+	position: relative;
+}
+
+#monthRanking {
+	position: absolute;
+	right: 5%;
+	top: 20px;
+	z-index: 10;
+	color: #fff;
+	padding: 6px 12px;
+	border: 1px solid #007aff;
+	background-color: #007aff;
+	border-radius: 10px;
+}
+
+.panel-col ul li {
+	padding: 20px 3%;
+	border-bottom: #eaeaea solid 1px;
+	display: flex;
+	justify-content: flex-start;
+}
+
+.panel-col {
+	line-height: normal;
+}
+
+.photoDiv {
+	width: 26%;
+	margin-right: 20px;
+}
+
+.panel-col ul li {
+	position: relative;
+}
+
+.panel-row1 {
+	font-size: 31px;
+	color: #333333;
+}
+
+.panel-row2 {
+	font-size: 18px;
+	color: #9a9a9a;
+}
+
+.panel-row3 {
+	font-size: 18px;
+	color: #9a9a9a;
+}
+
+.panel-row4 {
+	font-size: 22px;
+	/*color: #bd2b2c;*/
+}
+
+.panel-row-totle p+p {
+	margin-top: 8px;
+}
+
+.panel-row3 {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.panel-row3 span:first-child {
+	width: 89px;
+	height: 26px;
+	line-height: 26px;
+	text-align: center;
+	border-radius: 6px;
+	display: block;
+	background-color: #ff6c00;
+	color: #fff;
+	margin-right: 15px;
+}
+
+.addBtn {
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	right: 5%;
+	bottom: 20px;
+	z-index: 11;
+}
+
+.panel-row1,
+.shopName {
+	font-weight: 500;
+}
+
+.panel-row-totle section {
+	background-position: 0 100%;
+	background-repeat: no-repeat;
+	background-size: 40px 23px;
+	padding-left: 50px;
+}
+.plan3{
+	font-size: 18px;
+	text-decoration: line-through;
+	color: #222222;
+	margin-left: 20px;
+}
