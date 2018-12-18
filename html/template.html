@@ -9,7 +9,6 @@
 		<meta http-equiv="Cache-Control" content="no-cache, must-revalidate" />
 		<meta http-equiv="Pragma" content="no-cache" />
 		<meta http-equiv="Expires" content="0" />
-		<!--<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />-->
 		<title>首页</title>
 		<link href="../css/mui.css" rel="stylesheet" />
 		<link rel="stylesheet" href="../icon/iconfont.css" />
@@ -105,14 +104,13 @@
 				return (false);
 			}
 			//var token = getQueryVariable("tk");
-			var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvSlg1RTBWU3RpMVBnaHBtR0M4MC1WaEpid0dvIiwidXNlcklkIjoxNywicGlucGFpSWQiOjEsImxvZ2luVHlwZSI6Ind4IiwiZXhwIjoxNTQ1MDM0ODU3fQ.jCQHJU9HF-WQgTxyheaPMfKcOUVo0uHBUF0mgEWG81u-pTynzlK4pp-uNg8BOafn1AepwYGadTi_NnRPDXHWaQ"
+			var token = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJvRUYtMjFKVmUySHUyNDBQelAwbEVDclJSWEVJIiwidXNlcklkIjo1LCJwaW5wYWlJZCI6MSwibG9naW5UeXBlIjoid3giLCJleHAiOjE1NDU2MjkwOTJ9.CWZezUsDxcTUL9aa6oNbV4wxumz-PiC8zxxzfIgjSEEocqe5F3WxhzH6lWOUYDEwirAXfJKvm3KhepnGcgJZ-Q"
 			localStorage.setItem("token", token);
 			//var base = "https://www.goodb2b.cn/test/";
-			//var base = "https://www.goodb2b.cn/robert/";
-			var base = "http://192.168.1.67:9888/rttest/";
+			var base = "https://www.goodb2b.cn/robert/";
+			// var base = "http://192.168.1.67:9888/rttest/";
 			var Authorization = "Bearer " + token;
 			localStorage.setItem("base", base);
-
 
 
 

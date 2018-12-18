@@ -806,9 +806,9 @@
 							htmlVoucher += "<img class='selectCoupons' src='../img/comment_3.png' />"
 							htmlVoucher += "<p class='p1'>小玎小珰</p>"
 							htmlVoucher += "<p class='p2'>" + result.data[i].couName + "</p>"
-							if (result.data[i].couType == 2) {
-								htmlVoucher += "<span class='couponDescription'>此优惠券不适用于套餐</span>"
-							}
+							// if (result.data[i].couType == 2) {
+							// 	htmlVoucher += "<span class='couponDescription'>此优惠券不适用于套餐</span>"
+							// }
 							htmlVoucher += "<p class='p3'>有效期:<span>" + result.data[i].startDate.substring(10, -1) + "至" + result.data[i]
 								.endDate.substring(10, -1) + "</span></p>"
 							htmlVoucher += "<span class='status' style='color:#369dfc;'>有效</span>"

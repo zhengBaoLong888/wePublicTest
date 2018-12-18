@@ -28,6 +28,7 @@
 			var token = localStorage.getItem("token");
 			var Authorization = "Bearer " + token;
 			var relatedobj = JSON.parse(localStorage.getItem('reltArray'));
+
 			function discover() {
 				$.ajax({
 					type: "post",
